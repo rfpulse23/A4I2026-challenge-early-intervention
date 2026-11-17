@@ -684,3 +684,93 @@
 .send-btn:hover {
   background-color: var(--md-surface-variant);
 }
+
+/* Track 2 & 3 Custom Styles */
+.track-header-banner {
+  margin-bottom: 20px;
+}
+
+.track-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--md-primary);
+  background-color: var(--md-primary-container);
+  padding: 4px 10px;
+  border-radius: var(--md-radius-pill);
+  margin-bottom: 8px;
+}
+
+.track-tag .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.track-desc {
+  font-size: 13px;
+  color: var(--md-on-surface-variant);
+  margin-top: 4px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  padding: 16px;
+  border-radius: var(--md-radius-md);
+  background-color: var(--md-surface);
+  border: 1px solid var(--md-outline-variant);
+  box-shadow: var(--md-shadow-card);
+}
+
+.metric-card.alert {
+  border-left: 4px solid var(--md-error);
+}
+
+.metric-card.success {
+  border-left: 4px solid var(--md-success);
+}
+
+.metric-card.highlight {
+  border-left: 4px solid var(--md-primary);
+}
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--md-on-surface);
+  line-height: 1.1;
+}
+
+.metric-subtext {
+  font-size: 11px;
+  color: var(--md-on-surface-variant);
+  margin-top: 6px;
+}
+
+.guardrail-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--md-radius-md);
+  font-size: 13px;
+  color: #14532d;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}

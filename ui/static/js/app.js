@@ -3,21 +3,25 @@ import { FilterBar } from "./components/FilterBar.js";
 import { CandidateSummaryBar, AiInsightsBanner } from "./components/CandidateAndInsights.js";
 import { PathwayComparison } from "./components/PathwayComparison.js";
 import { GoogleCloudAssist } from "./components/GoogleCloudAssist.js";
+import { NetworkAuditPanel, ScreeningSeasonPanel } from "./components/TrackPanels.js";
 
 class App {
   constructor() {
+    this.currentTrack = "new_case"; // "new_case" (Track 1), "network_audit" (Track 2), "screening_season" (Track 3)
     this.currentCandidate = "Mateo S.";
     this.currentState = "MS";
     this.candidateData = {};
     this.pathwayData = {};
+    this.auditData = {};
+    this.screeningData = {};
     this.chatMessages = [
       {
         sender: "user",
-        text: "Why does Intake Hub 012 look healthy but still cause 45-day breaches?"
+        text: "How does the assistant coordinate all 3 IDEA Part C tracks under the federal 45-day clock?"
       },
       {
         sender: "ai",
-        text: "Intake Hub 012 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But 28% of similar cases are re-routed due to paper fax and eligibility mismatches, adding ~11 extra days and often pushing the total over 45 days."
+        text: "Welcome! Our assistant coordinates across all 3 tracks:\n• Track 1: Routes 20-month toddlers like Mateo S. to bilingual Medicaid evaluators under 45 days.\n• Track 2: Audits regional networks, exposing 3-hop paper-fax bounce hubs.\n• Track 3: Prioritizes high-poverty zero-vehicle tracts for community screening only when downstream <=45-day capacity is strictly verified."
       }
     ];
   }
@@ -30,11 +34,19 @@ class App {
 
   async fetchData() {
     try {
-      const res = await fetch(`/api/pathways/compare?candidate_name=${encodeURIComponent(this.currentCandidate)}&state=${this.currentState}`);
-      this.pathwayData = await res.json();
-      this.candidateData = this.pathwayData.candidate || {};
+      if (this.currentTrack === "new_case") {
+        const res = await fetch(`/api/pathways/compare?candidate_name=${encodeURIComponent(this.currentCandidate)}&state=${this.currentState}`);
+        this.pathwayData = await res.json();
+        this.candidateData = this.pathwayData.candidate || {};
+      } else if (this.currentTrack === "network_audit") {
+        const res = await fetch(`/api/tracks/network-audit?state=${this.currentState}`);
+        this.auditData = await res.json();
+      } else if (this.currentTrack === "screening_season") {
+        const res = await fetch(`/api/tracks/screening-season?state=${this.currentState}`);
+        this.screeningData = await res.json();
+      }
     } catch (e) {
-      console.error("Failed to load pathway data:", e);
+      console.error("Failed to load track data:", e);
     }
   }
 
@@ -42,12 +54,28 @@ class App {
     const root = document.getElementById("app-root");
     if (!root) return;
 
-    const topBar = new TopAppBar("Mississippi (MS)");
-    const filterBar = new FilterBar([], this.currentCandidate, this.currentState);
-    const candidateSummary = new CandidateSummaryBar(this.candidateData);
-    const aiInsights = new AiInsightsBanner(this.pathwayData.insights);
-    const pathwayComp = new PathwayComparison(this.pathwayData);
-    const assist = new GoogleCloudAssist(this.chatMessages);
+    const topBar = new TopAppBar(this.getStateName(this.currentState));
+    const filterBar = new FilterBar([], this.currentCandidate, this.currentState, this.currentTrack);
+    const assist = new GoogleCloudAssist(this.chatMessages, this.currentTrack);
+
+    let mainLeftContent = "";
+
+    if (this.currentTrack === "new_case") {
+      const candidateSummary = new CandidateSummaryBar(this.candidateData);
+      const aiInsights = new AiInsightsBanner(this.pathwayData.insights);
+      const pathwayComp = new PathwayComparison(this.pathwayData);
+      mainLeftContent = `
+        ${candidateSummary.render()}
+        ${aiInsights.render()}
+        ${pathwayComp.render()}
+      `;
+    } else if (this.currentTrack === "network_audit") {
+      const auditPanel = new NetworkAuditPanel(this.auditData);
+      mainLeftContent = auditPanel.render();
+    } else if (this.currentTrack === "screening_season") {
+      const screeningPanel = new ScreeningSeasonPanel(this.screeningData);
+      mainLeftContent = screeningPanel.render();
+    }
 
     root.innerHTML = `
       <div class="app-container">
@@ -55,14 +83,12 @@ class App {
         ${filterBar.render()}
 
         <main class="main-content">
-          <!-- Left Column -->
+          <!-- Left Column (Active Track View) -->
           <div class="left-col">
-            ${candidateSummary.render()}
-            ${aiInsights.render()}
-            ${pathwayComp.render()}
+            ${mainLeftContent}
           </div>
 
-          <!-- Right Column -->
+          <!-- Right Column (Conversational ADK Co-Pilot) -->
           <div class="right-col">
             ${assist.render()}
           </div>
@@ -71,7 +97,29 @@ class App {
     `;
   }
 
+  getStateName(code) {
+    const map = {
+      MS: "Mississippi (MS)",
+      AL: "Alabama (AL)",
+      GA: "Georgia (GA)",
+      TX: "Texas (TX)",
+      CA: "California (CA)",
+      NY: "New York (NY)"
+    };
+    return map[code] || `${code}`;
+  }
+
   bindEvents() {
+    // Task Mode Track Selector Change
+    const taskModeSelect = document.getElementById("select-task-mode");
+    if (taskModeSelect) {
+      taskModeSelect.value = this.currentTrack;
+      taskModeSelect.addEventListener("change", async (e) => {
+        this.currentTrack = e.target.value;
+        await this.handleTrackSwitch();
+      });
+    }
+
     // Analyze button
     const btnAnalyze = document.getElementById("btn-analyze-pathways");
     if (btnAnalyze) {
@@ -118,13 +166,19 @@ class App {
     }
   }
 
+  async handleTrackSwitch() {
+    await this.fetchData();
+    this.render();
+    this.bindEvents();
+  }
+
   async handleAnalyze() {
     const candInput = document.getElementById("input-candidate");
     if (candInput && candInput.value.trim()) {
       this.currentCandidate = candInput.value.trim();
     }
     const btn = document.getElementById("btn-analyze-pathways");
-    if (btn) btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Analyzing...`;
+    if (btn) btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Updating...`;
 
     await this.fetchData();
     this.render();
@@ -178,9 +232,8 @@ class App {
   updateChatUI() {
     const root = document.querySelector(".right-col");
     if (root) {
-      const assist = new GoogleCloudAssist(this.chatMessages);
+      const assist = new GoogleCloudAssist(this.chatMessages, this.currentTrack);
       root.innerHTML = assist.render();
-      // re-bind chat events
       const chatInput = document.getElementById("assist-input-field");
       const sendBtn = document.getElementById("btn-send-chat");
       if (chatInput && sendBtn) {
@@ -189,7 +242,6 @@ class App {
           if (e.key === "Enter") this.handleSendChat();
         });
       }
-      // scroll to bottom
       const history = document.getElementById("assist-chat-history");
       if (history) history.scrollTop = history.scrollHeight;
     }

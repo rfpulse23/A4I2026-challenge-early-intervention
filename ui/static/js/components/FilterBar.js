@@ -1,27 +1,28 @@
 export class FilterBar {
-  constructor(candidates = [], selectedCandidate = "Mateo S.", selectedState = "MS") {
+  constructor(candidates = [], selectedCandidate = "Mateo S.", selectedState = "MS", selectedTrack = "new_case") {
     this.candidates = candidates;
     this.selectedCandidate = selectedCandidate;
     this.selectedState = selectedState;
+    this.selectedTrack = selectedTrack;
   }
 
   render() {
     return `
       <section class="filter-bar">
         <div class="filter-group">
-          <label class="filter-label">Planning before referral</label>
+          <label class="filter-label">Challenge Track & Role</label>
           <div class="filter-input-wrap">
             <select class="filter-select" id="select-task-mode">
-              <option value="new_case">Plan a Referral Path (New Case)</option>
-              <option value="network_audit">Quarterly Network Audit (Track 2)</option>
-              <option value="screening_season">Community Screening Season (Track 3)</option>
+              <option value="new_case" ${this.selectedTrack === 'new_case' ? 'selected' : ''}>🧭 Track 1: Today's Toddler Referral</option>
+              <option value="network_audit" ${this.selectedTrack === 'network_audit' ? 'selected' : ''}>🕸️ Track 2: This Quarter's Network Audit</option>
+              <option value="screening_season" ${this.selectedTrack === 'screening_season' ? 'selected' : ''}>📋 Track 3: This Community Screening Season</option>
             </select>
             <span class="material-symbols-outlined input-icon-right" style="pointer-events:none;">expand_more</span>
           </div>
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">Region</label>
+          <label class="filter-label">State Jurisdiction</label>
           <div class="filter-input-wrap">
             <select class="filter-select" id="select-region">
               <option value="MS" ${this.selectedState === 'MS' ? 'selected' : ''}>Mississippi (MS)</option>
@@ -35,7 +36,7 @@ export class FilterBar {
           </div>
         </div>
 
-        <div class="filter-group">
+        <div class="filter-group" style="${this.selectedTrack !== 'new_case' ? 'opacity: 0.5; pointer-events: none;' : ''}">
           <label class="filter-label">Candidate Name</label>
           <div class="filter-input-wrap">
             <span class="material-symbols-outlined input-icon-left">search</span>
@@ -46,7 +47,7 @@ export class FilterBar {
 
         <button class="btn-primary-action" id="btn-analyze-pathways">
           <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
-          <span>Analyze Pathways</span>
+          <span>Run Analysis</span>
         </button>
       </section>
     `;
