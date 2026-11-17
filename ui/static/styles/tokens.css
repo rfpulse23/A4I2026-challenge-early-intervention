@@ -1,0 +1,54 @@
+:root {
+  /* Google Material Design 3 / Cloud Console Color Tokens */
+  --md-primary: #0b57d0;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #d3e3fd;
+  --md-on-primary-container: #041e49;
+
+  --md-secondary: #00639b;
+  --md-secondary-container: #c2e7ff;
+  --md-on-secondary-container: #001d35;
+
+  --md-surface: #ffffff;
+  --md-surface-variant: #edf2fa;
+  --md-surface-container-low: #f8fafd;
+  --md-surface-container-highest: #e0e2ec;
+  --md-on-surface: #1f1f1f;
+  --md-on-surface-variant: #444746;
+  --md-outline: #c4c7c5;
+  --md-outline-variant: #e0e2ec;
+
+  /* Status Colors */
+  --md-success: #146c2e;
+  --md-success-container: #c4eed0;
+  --md-on-success-container: #072711;
+
+  --md-error: #b3261e;
+  --md-error-container: #f9dedc;
+  --md-on-error-container: #410e0b;
+
+  --md-warning: #b06000;
+  --md-warning-container: #ffe082;
+  --md-on-warning-container: #261600;
+
+  /* AI Sparkle */
+  --md-ai-sparkle: #1a73e8;
+  --md-ai-tint: #e8f0fe;
+  --md-ai-border: #d2e3fc;
+
+  /* Typography */
+  --md-font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --md-font-mono: "Roboto Mono", monospace;
+
+  /* Elevation Shadows */
+  --md-shadow-1: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --md-shadow-2: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  --md-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  /* Shape */
+  --md-radius-xs: 4px;
+  --md-radius-sm: 8px;
+  --md-radius-md: 12px;
+  --md-radius-lg: 16px;
+  --md-radius-pill: 9999px;
+}
