@@ -135,3 +135,35 @@ def run_suite():
 
 if __name__ == "__main__":
     run_suite()
+
+    # -------------------------------------------------------------------------
+    # BONUS EVALUATION (+10 Points Rubric Dimension)
+    # -------------------------------------------------------------------------
+    print("\n" + "#" * 60)
+    print(" 🌟 BONUS RUBRIC EVALUATION (+10 POINTS)")
+    print("#" * 60)
+
+    from agent.tools.bonus_services import (
+        simulate_counterfactual_bottlenecks,
+        triage_aging_out_risk,
+        prioritize_byod_community_screening
+    )
+
+    print("\n[Bonus 1: Query 4 Counterfactual Bottleneck Simulation]")
+    b1 = simulate_counterfactual_bottlenecks("MS")
+    print(f"  • Episodes: {b1['total_referral_episodes']} | Breaches: {b1['baseline_statutory_breaches']}")
+    print(f"  • Recovered to Compliance: {b1['cases_recovered_to_compliance']} ({b1['statutory_recovery_rate_pct']}%)")
+    print(f"  • Total Child-Days Saved: {b1['total_child_days_saved']} days")
+    print(f"  • Insight: {b1['policy_insight']}")
+
+    print("\n[Bonus 2: Query 5 Aging-Out Triage (32 Months)]")
+    b2 = triage_aging_out_risk(32)
+    print(f"  • Child Age: {b2['child_age_months']} months (Termination in {b2['months_until_part_c_termination']} months)")
+    print(f"  • Risk Tier: {b2['transition_risk_tier']} (Urgency: {b2['urgency_level']})")
+    print(f"  • Clinical Guidance: {b2['clinical_action_guidance']}")
+    print(f"  • Mandatory Part B Notification: {b2['mandatory_part_b_preschool_notification']}")
+
+    print("\n[Bonus 3: Query 6 BYOD Outreach Prioritization]")
+    b3 = prioritize_byod_community_screening("MS", limit=2)
+    for p in b3['priority_tracts']:
+        print(f"  • {p['county_name']} (Tract {p['census_tract_geoid']}): Poverty={p['poverty_rate_pct']}%, NoVehicle={p['no_vehicle_rate_pct']}% -> {p['outreach_deployment_tier']}")

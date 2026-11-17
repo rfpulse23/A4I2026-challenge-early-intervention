@@ -200,3 +200,33 @@ def mcp_counterfactual_fix(hub_id: str = "SYN-PROV-MS-009", action: str = "upgra
 )
 def mcp_plan_screening(state_code: str = "MS", max_travel_distance_km: float = 40.0, top_n_tracts: int = 5) -> Dict[str, Any]:
     return plan_community_screening_season(state_code=state_code, max_travel_distance_km=max_travel_distance_km, top_n_tracts=top_n_tracts)
+
+# -----------------------------------------------------------------------------
+# Bonus Rubric Tools (+10 Points)
+# -----------------------------------------------------------------------------
+from agent.tools.bonus_services import (
+    simulate_counterfactual_bottlenecks,
+    triage_aging_out_risk,
+    prioritize_byod_community_screening
+)
+
+@mcp.tool(
+    name="run_counterfactual_bottleneck_simulation",
+    description="[Bonus +10] Query 4 Counterfactual Simulation: Replaces paper-fax handoffs with electronic portal intake (4-day baseline wait), computing child-days saved and cases recovered to 45-day statutory compliance."
+)
+def mcp_counterfactual_bottlenecks(state_code: str = "MS") -> Dict[str, Any]:
+    return simulate_counterfactual_bottlenecks(state_code=state_code)
+
+@mcp.tool(
+    name="triage_child_aging_out_risk",
+    description="[Bonus +10] Query 5 Part C Aging-Out Risk Triage: Assesses the 36-month transition cliff, triggering fast-track evaluation and mandatory Part B preschool transition conferences under 34 CFR § 303.209."
+)
+def mcp_aging_out_triage(child_age_months: int = 32) -> Dict[str, Any]:
+    return triage_aging_out_risk(child_age_months=child_age_months)
+
+@mcp.tool(
+    name="prioritize_byod_screening_deployment",
+    description="[Bonus +10] Query 6 Compliant BYOD Enrichment: Combines Census under-5 counts, GTFS transit guardrails, and public Head Start/WIC directories to deploy mobile screening teams to high-need tracts."
+)
+def mcp_byod_enrichment(state_code: str = "MS", limit: int = 5) -> Dict[str, Any]:
+    return prioritize_byod_community_screening(state_code=state_code, limit=limit)
