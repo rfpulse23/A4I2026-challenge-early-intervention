@@ -181,9 +181,10 @@ def prioritize_byod_screening_deployment(state_code: str = "MS", limit: int = 5)
 # -----------------------------------------------------------------------------
 def check_transit_accessibility(origin_tract_geoid: str = "28011950701", target_hub_id: str = "SYN-PROV-MS-019") -> Dict[str, Any]:
     """
-    [Extension 1] Determines if a zero-vehicle caregiver can reach an evaluation hub by public bus using
-    BigQuery tract_transit_guardrails. Defaults to benchmark referral tract 28011950701 (Bolivar County)
-    and target hub SYN-PROV-MS-019. Automatically assesses Medicaid NEMT transportation dispatch.
+    [Extension 1] Determines if a zero-vehicle caregiver can reach an evaluation hub by public bus using BigQuery
+    tract_transit_guardrails. Defaults to benchmark referral tract 28011950701 (Bolivar County) and target hub
+    SYN-PROV-MS-019 (Greenwood). Also accepts plain county or city names (e.g. 'Bolivar County', 'Cleveland', 'Greenwood').
+    Automatically assesses Medicaid NEMT transportation dispatch. Never demand raw database keys or Census codes.
     """
     return check_zero_vehicle_transit_feasibility(origin_tract_geoid=origin_tract_geoid, target_hub_id=target_hub_id)
 
