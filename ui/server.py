@@ -45,41 +45,41 @@ CANDIDATES_REGISTRY = [
         "age_months": 20,
         "medicaid": True,
         "language": "Spanish",
-        "primary_concern": "Developmental Concern (Screening)",
+        "primary_concern": "Speech / Developmental Delay (Autism Screening)",
         "state_code": "MS",
         "state_name": "Mississippi (MS)",
         "tract_geoid": "28011950701",
         "historical_chain_id": "CHAIN-MS-009",
         "recommended_path": {
-            "estimated_total_days": 37,
+            "estimated_total_days": 22,
             "stepper_nodes": [
-                {"title": "Clinic", "days_label": "Day 0–7"},
-                {"title": "Intake", "days_label": "Day 8–12"},
-                {"title": "Eval Hub 019", "days_label": "Day 13–26"},
-                {"title": "Therapy", "days_label": "Day 27–37"}
+                {"title": "Clarksdale Clinic", "days_label": "Day 0–4"},
+                {"title": "Indianola Intake", "days_label": "Day 4–11"},
+                {"title": "Greenwood Hub", "days_label": "Day 11–17"},
+                {"title": "Greenville Therapy", "days_label": "Day 17–22"}
             ],
             "table_rows": [
-                {"step_no": 1, "step_name": "Clinic Referral (Clinic 003)", "channel": "E-Referral", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial referral and documentation."},
-                {"step_no": 2, "step_name": "Intake (Coordinator 011)", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "12 days", "notes": "Accepts Medicaid; Spanish services available."},
-                {"step_no": 3, "step_name": "Evaluation (Eval Hub 019)", "channel": "E-Referral", "wait_days": "14 days", "cumulative": "26 days", "notes": "Bilingual evaluator; Part C vendor enrolled."},
-                {"step_no": 4, "step_name": "Therapy Start (Therapy Services)", "channel": "E-Referral", "wait_days": "11 days", "cumulative": "37 days", "notes": "Can initiate services within compliance window."}
+                {"step_no": 1, "step_name": "Clarksdale Well-Child Pediatric Screening Group #08 [Synthetic] (Screening Pediatric Clinic, Coahoma Co, 7.7 km)", "channel": "EHR Electronic Portal", "wait_days": "4 days", "cumulative": "4 days", "notes": "Verified: Medicaid=True, Bilingual=Spanish"},
+                {"step_no": 2, "step_name": "Indianola Regional Part C Intake & Service Coordination Desk #11 [Synthetic] (Part C Intake Coordinator, Sunflower Co)", "channel": "EHR Electronic Portal", "wait_days": "7 days", "cumulative": "11 days", "notes": "Verified: Medicaid=True, Bilingual=Spanish"},
+                {"step_no": 3, "step_name": "Greenwood Developmental-Behavioral & Speech Evaluation Center #19 [Synthetic] (Multidisciplinary Eval Hub, Leflore Co, 18.2 km)", "channel": "EHR Electronic Portal", "wait_days": "6 days", "cumulative": "17 days", "notes": "Verified: Medicaid=True, Bilingual=Spanish (Bilingual MD & SLP slot reserved)"},
+                {"step_no": 4, "step_name": "Greenville Early Childhood Speech, Occupational & Physical Therapy Organization #28 [Synthetic] (EI Therapy Vendor, Washington Co)", "channel": "EHR Electronic Portal", "wait_days": "5 days", "cumulative": "22 days", "notes": "Verified: Medicaid=True, Bilingual=Spanish (IFSP delivered in 22 calendar days)"}
             ]
         },
         "usual_path": {
-            "estimated_total_days": 73,
+            "estimated_total_days": 76,
             "stepper_nodes": [
                 {"title": "Clinic", "days_label": "Day 0–7"},
-                {"title": "Intake Hub 012", "days_label": "Day 8–14"},
-                {"title": "Eval Hub", "days_label": "Day 15–28"},
-                {"title": "Returned", "days_label": "+11 days", "is_returned": True},
-                {"title": "Therapy", "days_label": "Day 40–73"}
+                {"title": "Intake Hub 009", "days_label": "Day 8–15"},
+                {"title": "Eval Center", "days_label": "Day 16–35"},
+                {"title": "Returned", "days_label": "+18 days", "is_returned": True},
+                {"title": "Second Eval", "days_label": "Day 53–76"}
             ],
             "table_rows": [
-                {"step_no": 1, "step_name": "Screening Clinic (Clinic 003)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial batch faxing with incomplete Medicaid pre-check."},
-                {"step_no": 2, "step_name": "Intake Hub (Coordinator 012)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "14 days", "notes": "Low internal wait (5d), but forwarded via paper fax without language verification."},
-                {"step_no": 3, "step_name": "Downstream Hub (Eval Hub 008)", "channel": "Paper Fax", "wait_days": "14 days", "cumulative": "28 days", "notes": "Packet queued on waitlist; no Spanish bilingual clinician."},
-                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "11 days", "cumulative": "39 days", "notes": "Bounced back to coordinator: missing bilingual evaluator."},
-                {"step_no": 5, "step_name": "Second Evaluation & Therapy", "channel": "Paper Fax", "wait_days": "34 days", "cumulative": "73 days", "notes": "Severely breached Part C 45-day federal clock by 28 days."}
+                {"step_no": 1, "step_name": "Screening Clinic", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Paper referral packet faxed without language validation."},
+                {"step_no": 2, "step_name": "Regional Intake Hub SYN-PROV-MS-009", "channel": "Paper Fax", "wait_days": "8 days", "cumulative": "15 days", "notes": "3-hop bounce: Clinic -> Intake Hub -> Eval Hub due to non-bilingual hub."},
+                {"step_no": 3, "step_name": "Downstream Saturated Eval Center", "channel": "Paper Fax", "wait_days": "20 days", "cumulative": "35 days", "notes": "Packet queued on waitlist; no Spanish bilingual clinician on staff."},
+                {"step_no": 4, "step_name": "Returned Re-Referral (Bounce)", "channel": "Paper Fax", "wait_days": "18 days", "cumulative": "53 days", "notes": "Bounced back to coordinator: missing bilingual evaluator (exceeds 45-day federal clock)."},
+                {"step_no": 5, "step_name": "Second Evaluation & Therapy", "channel": "Paper Fax", "wait_days": "23 days", "cumulative": "76 days", "notes": "Breached Part C 45-day statutory limit by 31 days."}
             ]
         }
     },
@@ -299,8 +299,8 @@ def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
         ]
         
     insights_text = (
-        f"A faster, compliant path ({ai_total_days} days) is available by using an eligible evaluation provider "
-        "(Eval Hub 019) instead of Intake Hub 012, which often causes delays (paper fax and eligibility mismatch)."
+        f"A verified, compliant path ({ai_total_days} days) is available by routing electronically through qualified bilingual evaluation hubs "
+        "instead of Intake Hub SYN-PROV-MS-009, which triggers paper-fax 3-hop bounce loops taking 76 days."
     )
     
     return {
@@ -331,7 +331,27 @@ def api_chat(payload: ChatQuery):
     """
     q = payload.query.lower()
     
-    if "healthy" in q or "intake hub 012" in q:
+    if "assist" in q or "coordinate" in q or "all 3" in q or "track 1" in q or "hello" in q or "welcome" in q:
+        return {
+            "answer": "Focusing on Track 1: Active Toddler Referral. For 20-month-old Mateo S. in Bolivar County, our system traverses BigQuery referral graphs to avoid paper-fax bounce loops (e.g. at Hub 009) and connects him directly to a verified bilingual Medicaid evaluation hub within 22 calendar days (well under the 45-day federal clock)."
+        }
+    elif "iso gql" in q or "traverse" in q or "clarksdale" in q:
+        return {
+            "answer": "Traversing property graph using ISO GQL: MATCH (clinic:CareNode {provider_id: 'SYN-PROV-MS-008'})-[hops:ReferralHandoff]->{2,4}(vendor:CareNode) WHERE accepts_medicaid=TRUE AND bilingual_services_listed=TRUE. Result: 22-day compliant electronic route via Indianola Intake -> Greenwood Eval Hub -> Greenville Therapy."
+        }
+    elif "transit" in q or "public bus" in q or "vehicle" in q:
+        return {
+            "answer": "Transit Guardrail (Bolivar County, GEOID 28011950701): 11.8% zero-vehicle households; distance to nearest bilingual eval hub is 18.2 km (no direct municipal bus line). Automated Directive: Dispatch Medicaid Non-Emergency Transportation (NEMT) or schedule Mobile Evaluation."
+        }
+    elif "lock" in q or "reservation" in q or "acid" in q:
+        return {
+            "answer": "ACID Reservation Lock Confirmed: Evaluation slot reserved at Greenwood Developmental Center (SYN-PROV-MS-019) for Mateo S. on Day 14. Token: RES-98F2A1. Concurrency guardrail prevents double-booking across coordinators."
+        }
+    elif "action note" in q or "caregiver" in q or "bilingual" in q:
+        return {
+            "answer": "Caregiver Action Note Generated:\n\n[English]: Dear Family, your 20-month-old child is scheduled for a bilingual developmental evaluation at Greenwood Center within 14 business days. Free Medicaid NEMT transportation is provided.\n\n[Español]: Estimada familia, su niño(a) de 20 meses tiene cita de evaluación bilingüe en el Centro Greenwood en 14 días laborables. Transporte gratuito de Medicaid disponible."
+        }
+    elif "healthy" in q or "intake hub 012" in q:
         return {
             "answer": "Intake Hub 012 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But 28% of similar cases are re-routed due to paper fax and eligibility mismatches, adding ~11 extra days and often pushing the total over 45 days."
         }

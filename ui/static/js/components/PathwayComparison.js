@@ -77,9 +77,9 @@ export class PathwayComparison {
 
         <!-- Usual Path (Historical) -->
         <div class="pathway-card" id="card-usual">
-          <div class="pathway-header open" id="header-usual" onclick="window.app.toggleAccordion('usual')">
+          <div class="pathway-header" id="header-usual" onclick="window.app.toggleAccordion('usual')">
             <div class="pathway-title-area">
-              <span class="material-symbols-outlined" id="arrow-usual" style="font-size: 20px;">expand_more</span>
+              <span class="material-symbols-outlined" id="arrow-usual" style="font-size: 20px;">chevron_right</span>
               <span class="pathway-type-title title-usual">2. Usual Path (Historical)</span>
               <span class="pill-badge pill-over-limit">Over 45-day limit</span>
               <span class="app-divider" style="height: 14px;"></span>
@@ -87,7 +87,7 @@ export class PathwayComparison {
             </div>
           </div>
 
-          <div class="pathway-body" id="body-usual">
+          <div class="pathway-body" id="body-usual" style="display: none;">
             <!-- Stepper Flow -->
             <div class="stepper-flow">
               ${histSteps.map((s, idx) => `

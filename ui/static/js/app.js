@@ -87,6 +87,15 @@ class App {
       btnAnalyze.addEventListener("click", () => this.handleAnalyze());
     }
 
+    // Candidate select dropdown
+    const candSelect = document.getElementById("select-candidate-dropdown");
+    if (candSelect) {
+      candSelect.addEventListener("change", (e) => {
+        this.currentCandidate = e.target.value;
+        this.handleAnalyze();
+      });
+    }
+
     // Input Candidate enter key
     const candInput = document.getElementById("input-candidate");
     if (candInput) {
@@ -141,19 +150,37 @@ class App {
   }
 
   toggleAccordion(type) {
-    const body = document.getElementById(`body-${type}`);
-    const arrow = document.getElementById(`arrow-${type}`);
-    const header = document.getElementById(`header-${type}`);
-    if (!body || !arrow || !header) return;
+    const bodyRec = document.getElementById("body-rec");
+    const arrowRec = document.getElementById("arrow-rec");
+    const headerRec = document.getElementById("header-rec");
 
-    if (body.style.display === "none") {
-      body.style.display = "block";
-      arrow.textContent = "expand_more";
-      header.classList.add("open");
-    } else {
-      body.style.display = "none";
-      arrow.textContent = "chevron_right";
-      header.classList.remove("open");
+    const bodyUsual = document.getElementById("body-usual");
+    const arrowUsual = document.getElementById("arrow-usual");
+    const headerUsual = document.getElementById("header-usual");
+
+    // Only one path table should be expanded at a time
+    if (type === "rec") {
+      const isCurrentlyOpen = bodyRec.style.display !== "none";
+      if (!isCurrentlyOpen) {
+        bodyRec.style.display = "block";
+        arrowRec.textContent = "expand_more";
+        headerRec.classList.add("open");
+
+        bodyUsual.style.display = "none";
+        arrowUsual.textContent = "chevron_right";
+        headerUsual.classList.remove("open");
+      }
+    } else if (type === "usual") {
+      const isCurrentlyOpen = bodyUsual.style.display !== "none";
+      if (!isCurrentlyOpen) {
+        bodyUsual.style.display = "block";
+        arrowUsual.textContent = "expand_more";
+        headerUsual.classList.add("open");
+
+        bodyRec.style.display = "none";
+        arrowRec.textContent = "chevron_right";
+        headerRec.classList.remove("open");
+      }
     }
   }
 

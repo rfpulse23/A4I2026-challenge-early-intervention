@@ -3,11 +3,11 @@ export class GoogleCloudAssist {
     this.messages = messages.length > 0 ? messages : [
       {
         sender: "user",
-        text: "Why does Intake Hub 012 look healthy but still cause 45-day breaches?"
+        text: "How does the assistant coordinate Track 1 referrals under the federal 45-day clock?"
       },
       {
         sender: "ai",
-        text: "Intake Hub 012 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But 28% of similar cases are re-routed due to paper fax and eligibility mismatches, adding ~11 extra days and often pushing the total over 45 days."
+        text: "Focusing on Track 1: Active Toddler Referral. For 20-month-old Mateo S. in Bolivar County, our system traverses BigQuery referral graphs to avoid paper-fax bounce loops (e.g. at Hub 009) and connects him directly to a verified bilingual Medicaid evaluation hub within 22 calendar days (well under the 45-day federal clock)."
       }
     ];
   }
@@ -36,37 +36,31 @@ export class GoogleCloudAssist {
             </div>
           `).join('')}
 
-          <!-- Try Asking Me -->
+          <!-- Quick Actions for Track 1 -->
           <div class="quick-questions-section">
-            <div class="quick-title">Try asking me...</div>
+            <div class="quick-title">Quick Actions for this Track...</div>
             <div class="quick-list">
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Trace the 3–4 hop referral chains that breached 45 days.')">
+              <button class="quick-item-btn" onclick="window.app.askPrompt('Traverse the property graph using ISO GQL from Clarksdale Clinic.')">
                 <span class="material-symbols-outlined">hub</span>
-                <span>Trace the 3–4 hop referral chains that breached 45 days.</span>
+                <span>Traverse the property graph using ISO GQL from Clarksdale Clinic.</span>
                 <span class="material-symbols-outlined quick-arrow">chevron_right</span>
               </button>
 
-              <button class="quick-item-btn" onclick="window.app.askPrompt('What if we switch from paper fax to e-referral?')">
-                <span class="material-symbols-outlined">swap_horiz</span>
-                <span>What if we switch from paper fax to e-referral?</span>
+              <button class="quick-item-btn" onclick="window.app.askPrompt('Can a zero-vehicle caregiver reach the evaluation hub by public bus?')">
+                <span class="material-symbols-outlined">directions_bus</span>
+                <span>Can a zero-vehicle caregiver reach the evaluation hub by public bus?</span>
                 <span class="material-symbols-outlined quick-arrow">chevron_right</span>
               </button>
 
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Which intake hub saves the most delayed child-days?')">
-                <span class="material-symbols-outlined">bar_chart</span>
-                <span>Which intake hub saves the most delayed child-days?</span>
+              <button class="quick-item-btn" onclick="window.app.askPrompt('Lock an evaluation slot with an ACID reservation token.')">
+                <span class="material-symbols-outlined">lock</span>
+                <span>Lock an evaluation slot with an ACID reservation token.</span>
                 <span class="material-symbols-outlined quick-arrow">chevron_right</span>
               </button>
 
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Which neighborhoods have the most breaches?')">
-                <span class="material-symbols-outlined">location_on</span>
-                <span>Which neighborhoods have the most breaches?</span>
-                <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-              </button>
-
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Write a caregiver action note (English & Spanish).')">
+              <button class="quick-item-btn" onclick="window.app.askPrompt('Generate a bilingual caregiver action note (English & Spanish).')">
                 <span class="material-symbols-outlined">description</span>
-                <span>Write a caregiver action note (English & Spanish).</span>
+                <span>Generate a bilingual caregiver action note (English & Spanish).</span>
                 <span class="material-symbols-outlined quick-arrow">chevron_right</span>
               </button>
             </div>
@@ -75,7 +69,7 @@ export class GoogleCloudAssist {
 
         <!-- Input Bar -->
         <div class="assist-input-bar">
-          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a follow-up question..." />
+          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a question about this track..." />
           <button class="send-btn" id="btn-send-chat" title="Send">
             <span class="material-symbols-outlined">send</span>
           </button>
