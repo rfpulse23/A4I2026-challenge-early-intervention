@@ -44,3 +44,16 @@ tables cleanly without mixing states.
 - **Multi-hop graph topology & 45-day statutory breaches**: verifies `>= 2`-hop referral chains,
   `> 45`-day IDEA Part C episode breaches, and `0` orphan `source_provider_id` /
   `target_provider_id` foreign keys against `pediatric_and_ei_provider_directory`.
+
+---
+
+## Production SQL & Graph Query Catalog
+
+In addition to `load.sh`, this directory provides production-ready SQL and ISO GQL scripts ready to execute in BigQuery Studio or via the BigQuery Python SDK:
+
+| Script | Type | Target / Output | Purpose |
+|---|---|---|---|
+| [`01_create_property_graph.sql`](01_create_property_graph.sql) | DDL (ISO GQL) | `a4i_early_intervention.ReferralGraph` | Declares property graph with `CareNode` vertices and `ReferralHandoff` edges across 4 provider roles. |
+| [`02_create_transit_guardrails.sql`](02_create_transit_guardrails.sql) | DDL / Spatial SQL | `a4i_early_intervention.tract_transit_guardrails` | Joins Census ACS zero-vehicle rates with `ST_DISTANCE` to nearest bilingual Medicaid hub. |
+| [`03_referral_routing_queries.sql`](03_referral_routing_queries.sql) | Query Suite | Queries 1–6 | Production queries covering: Multi-hop breach diagnosis (`-{2,4}->`), compliant pathway discovery, post-output equity audit, counterfactual transmission upgrade simulation, 36-month age-out cliff triage, and Track 3 community screening outreach. |
+| [`04_state_screening_view.sql`](04_state_screening_view.sql) | DDL (View) | `a4i_early_intervention.v_state_screening_benchmarks` | Pivots HRSA NSCH survey strata into 1 row per state to prevent the 6x Cartesian join fan-out trap. |

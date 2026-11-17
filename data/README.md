@@ -29,3 +29,10 @@ Pre-staged GeoParquet starter tables covering six states (`MS`, `AL`, `GA`, `TX`
 ### `deidentified_part_c_referral_logs.parquet` (894 rows: 149 directed `ReferralHandoff` edges across 44 chains per state)
 
 - **Provenance:** **100% `[Synthetic]` multi-hop referral and re-referral bounce logs.** Variable-length (`2` to `4` hop) referral chains (`case_chain_id`, `hop_sequence`, `transmission_channel`, `handoff_wait_days`) inside the same `a4i_early_intervention` dataset, designed so ISO GQL variable-length path queries (`-{2,4}->`) uncover multi-hop paper-fax bounce loops breaching the federal 45-day IDEA Part C clock.
+
+### `tract_transit_guardrails` (Derived in BigQuery)
+
+- **Provenance:** Derived table combining real US Census ACS 5-Year zero-vehicle household rates (`acs_under5_tract_demographics`) with geodesic distance to the nearest bilingual Medicaid evaluation center (`pediatric_and_ei_provider_directory`).
+- **Purpose:** Identifies transit deserts where families lack personal vehicles and live >5 km from an evaluation hub.
+- **Action Trigger:** Automatically flags `HIGH_TRANSIT_BARRIER` and triggers recommendations for mobile developmental evaluation vans or tele-intake.
+- **State Scope:** Pre-computed for Mississippi (`MS`); dynamically reproducible for `AL`, `GA`, `TX`, `CA`, and `NY`.
