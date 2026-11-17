@@ -37,7 +37,8 @@ export class PathwayComparison {
             <div class="stepper-flow">
               ${recSteps.map((s, idx) => `
                 <div class="flow-step-node node-recommended">
-                  <div class="node-title">${s.title}</div>
+                  <div class="node-role">${s.role || s.title}</div>
+                  <div class="node-provider-name">${s.provider || ''}</div>
                   <div class="node-days">(${s.days_label})</div>
                 </div>
                 ${idx < recSteps.length - 1 ? '<div class="flow-arrow"><span class="material-symbols-outlined">arrow_forward</span></div>' : ''}
@@ -92,7 +93,8 @@ export class PathwayComparison {
             <div class="stepper-flow">
               ${histSteps.map((s, idx) => `
                 <div class="flow-step-node ${s.is_returned ? 'node-returned' : ''}">
-                  <div class="node-title">${s.is_returned ? "''" + s.title + "''" : s.title}</div>
+                  <div class="node-role ${s.is_returned ? 'text-returned' : ''}">${s.is_returned ? "''" + (s.role || s.title) + "''" : (s.role || s.title)}</div>
+                  <div class="node-provider-name ${s.is_returned ? 'text-returned-sub' : ''}">${s.provider || ''}</div>
                   <div class="node-days ${s.is_returned ? 'node-days-returned' : ''}">${s.days_label.startsWith('+') ? s.days_label : '(' + s.days_label + ')'}</div>
                 </div>
                 ${idx < histSteps.length - 1 ? '<div class="flow-arrow"><span class="material-symbols-outlined">arrow_forward</span></div>' : ''}

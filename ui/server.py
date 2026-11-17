@@ -53,10 +53,26 @@ CANDIDATES_REGISTRY = [
         "recommended_path": {
             "estimated_total_days": 22,
             "stepper_nodes": [
-                {"title": "Clarksdale Clinic", "days_label": "Day 0–4"},
-                {"title": "Indianola Intake", "days_label": "Day 4–11"},
-                {"title": "Greenwood Hub", "days_label": "Day 11–17"},
-                {"title": "Greenville Therapy", "days_label": "Day 17–22"}
+                {
+                    "role": "Clinic",
+                    "provider": "Clarksdale Well-Child #08",
+                    "days_label": "Day 0–4"
+                },
+                {
+                    "role": "Coordinator",
+                    "provider": "Indianola Intake Desk #11",
+                    "days_label": "Day 4–11"
+                },
+                {
+                    "role": "Hub",
+                    "provider": "Greenwood Eval Hub #19",
+                    "days_label": "Day 11–17"
+                },
+                {
+                    "role": "Vendor",
+                    "provider": "Greenville Therapy #28",
+                    "days_label": "Day 17–22"
+                }
             ],
             "table_rows": [
                 {"step_no": 1, "step_name": "Clarksdale Well-Child Pediatric Screening Group #08 [Synthetic] (Screening Pediatric Clinic, Coahoma Co, 7.7 km)", "channel": "EHR Electronic Portal", "wait_days": "4 days", "cumulative": "4 days", "notes": "Verified: Medicaid=True, Bilingual=Spanish"},
@@ -68,11 +84,32 @@ CANDIDATES_REGISTRY = [
         "usual_path": {
             "estimated_total_days": 76,
             "stepper_nodes": [
-                {"title": "Clinic", "days_label": "Day 0–7"},
-                {"title": "Intake Hub 009", "days_label": "Day 8–15"},
-                {"title": "Eval Center", "days_label": "Day 16–35"},
-                {"title": "Returned", "days_label": "+18 days", "is_returned": True},
-                {"title": "Second Eval", "days_label": "Day 53–76"}
+                {
+                    "role": "Clinic",
+                    "provider": "Clarksdale Clinic",
+                    "days_label": "Day 0–7"
+                },
+                {
+                    "role": "Intake Hub",
+                    "provider": "Regional Hub SYN-PROV-MS-009",
+                    "days_label": "Day 8–15"
+                },
+                {
+                    "role": "Eval Center",
+                    "provider": "Saturated Eval Hub",
+                    "days_label": "Day 16–35"
+                },
+                {
+                    "role": "Returned",
+                    "provider": "No Bilingual Evaluator",
+                    "days_label": "+18 days",
+                    "is_returned": True
+                },
+                {
+                    "role": "Second Eval",
+                    "provider": "Late Re-Referral",
+                    "days_label": "Day 53–76"
+                }
             ],
             "table_rows": [
                 {"step_no": 1, "step_name": "Screening Clinic", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Paper referral packet faxed without language validation."},

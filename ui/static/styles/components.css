@@ -395,13 +395,16 @@
 
 .flow-step-node {
   flex: 1;
-  min-width: 110px;
-  padding: 10px 12px;
+  min-width: 130px;
+  padding: 8px 10px;
   border-radius: var(--md-radius-sm);
   background-color: #ffffff;
   border: 1px solid var(--md-outline-variant);
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .flow-step-node.node-recommended {
@@ -409,24 +412,40 @@
   border: 1px solid #c2e7ff;
 }
 
-.flow-step-node.node-recommended .node-title {
-  color: #0b57d0;
-  font-weight: 700;
-}
-
 .flow-step-node.node-returned {
   background-color: #ffffff;
   border: 1px solid #fad2cf;
 }
 
-.flow-step-node.node-returned .node-title {
-  color: #b3261e;
+.node-role {
+  font-size: 13px;
   font-weight: 700;
+  color: #0b57d0;
+  margin-bottom: 2px;
+}
+
+.text-returned {
+  color: #b3261e !important;
+}
+
+.node-provider-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-returned-sub {
+  color: #b3261e;
+  font-weight: 500;
 }
 
 .node-title {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0b57d0;
   margin-bottom: 2px;
 }
