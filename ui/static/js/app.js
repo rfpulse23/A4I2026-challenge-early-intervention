@@ -14,6 +14,8 @@ class App {
     this.pathwayData = {};
     this.auditData = {};
     this.screeningData = {};
+    this.isLoadingChat = false;
+    this.quickChipsCollapsed = false;
     this.chatMessages = [
       {
         sender: "user",
@@ -156,13 +158,32 @@ class App {
     }
 
     // Chat input
+    this.bindChatEvents();
+  }
+
+  bindChatEvents() {
     const chatInput = document.getElementById("assist-input-field");
     const sendBtn = document.getElementById("btn-send-chat");
     if (chatInput && sendBtn) {
-      sendBtn.addEventListener("click", () => this.handleSendChat());
-      chatInput.addEventListener("keydown", (e) => {
+      sendBtn.onclick = () => this.handleSendChat();
+      chatInput.onkeydown = (e) => {
         if (e.key === "Enter") this.handleSendChat();
-      });
+      };
+    }
+  }
+
+  toggleQuickChips() {
+    const container = document.getElementById("quick-chips-container");
+    const icon = document.getElementById("quick-chips-toggle-icon");
+    if (!container || !icon) return;
+
+    this.quickChipsCollapsed = !this.quickChipsCollapsed;
+    if (this.quickChipsCollapsed) {
+      container.style.display = "none";
+      icon.textContent = "expand_more";
+    } else {
+      container.style.display = "flex";
+      icon.textContent = "expand_less";
     }
   }
 
@@ -203,20 +224,33 @@ class App {
   }
 
   async askPrompt(promptText) {
-    this.chatMessages.push({ sender: "user", text: promptText });
+    if (!promptText || !promptText.trim()) return;
+    if (this.isLoadingChat) return;
+
+    this.isLoadingChat = true;
+    this.chatMessages.push({ sender: "user", text: promptText.trim() });
+    
+    // Add temporary loading indicator
+    this.chatMessages.push({ sender: "ai", text: "Analyzing across BigQuery & Property Graph..." });
     this.updateChatUI();
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: promptText, state: this.currentState })
+        body: JSON.stringify({ query: promptText.trim(), state: this.currentState })
       });
       const data = await res.json();
-      this.chatMessages.push({ sender: "ai", text: data.answer });
-      this.updateChatUI();
+      
+      // Replace the loading message with the real answer
+      this.chatMessages.pop();
+      this.chatMessages.push({ sender: "ai", text: data.answer || "No response received." });
     } catch (e) {
-      this.chatMessages.push({ sender: "ai", text: "Error connecting to ADK Agent." });
+      console.error("Chat error:", e);
+      this.chatMessages.pop();
+      this.chatMessages.push({ sender: "ai", text: "Error: Unable to connect to the backend agent server." });
+    } finally {
+      this.isLoadingChat = false;
       this.updateChatUI();
     }
   }
@@ -234,16 +268,21 @@ class App {
     if (root) {
       const assist = new GoogleCloudAssist(this.chatMessages, this.currentTrack);
       root.innerHTML = assist.render();
-      const chatInput = document.getElementById("assist-input-field");
-      const sendBtn = document.getElementById("btn-send-chat");
-      if (chatInput && sendBtn) {
-        sendBtn.addEventListener("click", () => this.handleSendChat());
-        chatInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") this.handleSendChat();
-        });
+      this.bindChatEvents();
+      
+      // Preserve quick chips collapsed state if toggled
+      if (this.quickChipsCollapsed) {
+        const container = document.getElementById("quick-chips-container");
+        const icon = document.getElementById("quick-chips-toggle-icon");
+        if (container) container.style.display = "none";
+        if (icon) icon.textContent = "expand_more";
       }
+
+      // Automatically scroll to the latest message so response is immediately visible
       const history = document.getElementById("assist-chat-history");
-      if (history) history.scrollTop = history.scrollHeight;
+      if (history) {
+        history.scrollTop = history.scrollHeight;
+      }
     }
   }
 }

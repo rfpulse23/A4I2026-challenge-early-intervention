@@ -3,11 +3,11 @@ export class GoogleCloudAssist {
     this.messages = messages.length > 0 ? messages : [
       {
         sender: "user",
-        text: "Why does Intake Hub 009 look healthy but still cause 45-day breaches?"
+        text: "How does the assistant coordinate all 3 IDEA Part C tracks under the federal 45-day clock?"
       },
       {
         sender: "ai",
-        text: "Intake Hub 009 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But paper faxes forwarded without language verification cause 3-hop bounce loops taking 76 days, breaching federal compliance by 31 days!"
+        text: "Welcome! Our assistant coordinates across all 3 tracks:\n• Track 1: Routes 20-month toddlers like Mateo S. to bilingual Medicaid evaluators under 45 days.\n• Track 2: Audits regional networks, exposing 3-hop paper-fax bounce hubs.\n• Track 3: Prioritizes high-poverty zero-vehicle tracts for community screening only when downstream <=45-day capacity is strictly verified."
       }
     ];
     this.activeTrack = activeTrack;
@@ -20,22 +20,22 @@ export class GoogleCloudAssist {
       quickQuestions = [
         {
           icon: "route",
-          text: "Traverse the property graph using ISO GQL from Clarksdale Clinic.",
+          text: "Traverse property graph with ISO GQL",
           prompt: "Traverse the BigQuery property graph using variable-length ISO GQL from Clarksdale Clinic to find an active compliant pathway matching Medicaid and bilingual requirements."
         },
         {
           icon: "directions_bus",
-          text: "Can a zero-vehicle caregiver reach the evaluation hub by public bus?",
+          text: "Can a zero-vehicle caregiver reach hub?",
           prompt: "Can a zero-vehicle caregiver reach the evaluation hub by public bus?"
         },
         {
           icon: "lock",
-          text: "Lock an evaluation slot with an ACID reservation token.",
+          text: "Lock evaluation slot with ACID token",
           prompt: "Display the complete 4-hop pathway latency breakdown for CHAIN-MS-009, lock an evaluation slot with an ACID reservation, and defend your choice of the ADK Web interface."
         },
         {
           icon: "description",
-          text: "Generate a bilingual caregiver action note (English & Spanish).",
+          text: "Generate bilingual caregiver note",
           prompt: "Write a caregiver action note (English & Spanish)."
         }
       ];
@@ -43,22 +43,22 @@ export class GoogleCloudAssist {
       quickQuestions = [
         {
           icon: "hub",
-          text: "Diagnose why regional 45-day compliance dropped below 60%.",
+          text: "Diagnose compliance drop below 60%",
           prompt: "Trace the 3–4 hop referral chains that breached 45 days and identify top bounce hubs."
         },
         {
           icon: "swap_horiz",
-          text: "Run Query 4 counterfactual simulation (paper fax -> EHR portal).",
+          text: "Run Q4 counterfactual simulation",
           prompt: "What if we switch from paper fax to e-referral across Mississippi?"
         },
         {
           icon: "bar_chart",
-          text: "Which intake hub saves the most delayed child-days?",
+          text: "Which intake hub saves most days?",
           prompt: "Which intake hub saves the most delayed child-days?"
         },
         {
           icon: "timer",
-          text: "Triage a 32-month-old toddler approaching the age-3 cliff.",
+          text: "Triage 32-month aging-out cliff",
           prompt: "Triage a 32-month-old toddler facing Part C termination."
         }
       ];
@@ -66,22 +66,22 @@ export class GoogleCloudAssist {
       quickQuestions = [
         {
           icon: "location_on",
-          text: "Prioritize top high-poverty, zero-vehicle tracts with verified capacity.",
+          text: "Prioritize top tracts with verified capacity",
           prompt: "Plan the community screening season prioritizing tracts with verified downstream capacity."
         },
         {
           icon: "verified_user",
-          text: "How do we prevent creating dead-end waitlists during screening?",
+          text: "Prevent creating dead-end waitlists",
           prompt: "Why must downstream 45-day evaluation capacity be verified before screening?"
         },
         {
           icon: "storefront",
-          text: "Locate partner Head Start and WIC centers for mobile vans.",
+          text: "Locate Head Start and WIC centers",
           prompt: "Find Head Start and WIC screening sites in high-need counties."
         },
         {
           icon: "directions_bus",
-          text: "Check transit feasibility for high-need Delta tracts.",
+          text: "Check Delta transit feasibility",
           prompt: "Can a zero-vehicle caregiver reach the evaluation hub by public bus?"
         }
       ];
@@ -94,11 +94,11 @@ export class GoogleCloudAssist {
             <span class="material-symbols-outlined">auto_awesome</span>
             <span>Google Cloud Assist</span>
           </div>
-          <span class="adk-badge">Conversational ADK Agent</span>
+          <span class="adk-badge">Live ADK Agent</span>
         </div>
 
+        <!-- Chat Stream (Takes Full Height with Auto-Scroll) -->
         <div class="assist-scroll-content" id="assist-chat-history">
-          <!-- Chat Bubbles -->
           ${this.messages.map(m => `
             <div class="chat-msg ${m.sender}">
               <div class="chat-avatar ${m.sender === 'user' ? 'user-avatar' : 'ai-avatar'}">
@@ -109,25 +109,27 @@ export class GoogleCloudAssist {
               </div>
             </div>
           `).join('')}
+        </div>
 
-          <!-- Try Asking Me -->
-          <div class="quick-questions-section">
-            <div class="quick-title">Quick Actions for this Track...</div>
-            <div class="quick-list">
-              ${quickQuestions.map(q => `
-                <button class="quick-item-btn" onclick="window.app.askPrompt('${q.prompt.replace(/'/g, "\\'")}')">
-                  <span class="material-symbols-outlined">${q.icon}</span>
-                  <span>${q.text}</span>
-                  <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-                </button>
-              `).join('')}
-            </div>
+        <!-- Compact Collapsible Quick Chips Section (Fixed at bottom above input) -->
+        <div class="assist-quick-chips-wrapper">
+          <div class="quick-chips-header" onclick="window.app.toggleQuickChips()">
+            <span class="quick-title"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle;">flash_on</span> Suggested Actions</span>
+            <span class="material-symbols-outlined quick-chips-toggle-icon" id="quick-chips-toggle-icon">expand_less</span>
+          </div>
+          <div class="quick-chips-scroll" id="quick-chips-container">
+            ${quickQuestions.map((q, idx) => `
+              <button class="quick-chip-btn" data-prompt-idx="${idx}" onclick="window.app.askPrompt(this.getAttribute('data-prompt'))" data-prompt="${q.prompt.replace(/"/g, '&quot;')}" title="${q.prompt.replace(/"/g, '&quot;')}">
+                <span class="material-symbols-outlined">${q.icon}</span>
+                <span>${q.text}</span>
+              </button>
+            `).join('')}
           </div>
         </div>
 
         <!-- Input Bar -->
         <div class="assist-input-bar">
-          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a question about this track..." />
+          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a question about this track..." autocomplete="off" />
           <button class="send-btn" id="btn-send-chat" title="Send">
             <span class="material-symbols-outlined">send</span>
           </button>
