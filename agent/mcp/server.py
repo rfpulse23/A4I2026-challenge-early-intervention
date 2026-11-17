@@ -230,3 +230,27 @@ def mcp_aging_out_triage(child_age_months: int = 32) -> Dict[str, Any]:
 )
 def mcp_byod_enrichment(state_code: str = "MS", limit: int = 5) -> Dict[str, Any]:
     return prioritize_byod_community_screening(state_code=state_code, limit=limit)
+
+# -----------------------------------------------------------------------------
+# ISO GQL Property Graph Traversal Tool
+# -----------------------------------------------------------------------------
+from agent.tools.gql_traversal_service import traverse_referral_property_graph
+
+@mcp.tool(
+    name="traverse_property_graph_iso_gql",
+    description="[Technical Execution] Executes variable-length ISO GQL traversals over BigQuery ReferralGraph to find compliant multi-hop pathways matching Medicaid and bilingual requirements."
+)
+def mcp_traverse_property_graph_iso_gql(
+    origin_clinic: str = "Clarksdale",
+    requires_medicaid: bool = True,
+    requires_bilingual: bool = True,
+    max_days: int = 45,
+    state_code: str = "MS"
+) -> Dict[str, Any]:
+    return traverse_referral_property_graph(
+        origin_clinic_query=origin_clinic,
+        requires_medicaid=requires_medicaid,
+        requires_bilingual=requires_bilingual,
+        max_days=max_days,
+        state_code=state_code
+    )

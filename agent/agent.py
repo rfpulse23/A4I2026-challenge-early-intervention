@@ -8,6 +8,7 @@ Equipped with all 3 Official Tracks + All 3 Official Bonus Extensions (+10 Point
 - Bonus 1 (+10): Counterfactual Bottleneck Simulation (Query 4)
 - Bonus 2 (+10): Aging-Out Triage (Query 5: 36-Month Transition Cliff & LEA Notification)
 - Bonus 3 (+10): Compliant BYOD Enrichment (Query 6: Head Start, WIC, and GTFS transit guardrails)
+- Technical Execution: Direct ISO GQL Variable-Length Property Graph Traversal
 """
 import os
 import sys
@@ -26,6 +27,7 @@ from agent.tools.graph_service import (
     find_compliant_pathway,
     get_equity_audit
 )
+from agent.tools.gql_traversal_service import traverse_referral_property_graph
 from agent.tools.advanced_extensions import (
     check_zero_vehicle_transit_feasibility,
     find_community_screening_sites,
@@ -43,6 +45,30 @@ from agent.tools.bonus_services import (
 )
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+
+# -----------------------------------------------------------------------------
+# TECHNICAL EXECUTION: Direct Variable-Length ISO GQL Property Graph Traversal
+# -----------------------------------------------------------------------------
+def traverse_property_graph_iso_gql(
+    origin_clinic: str = "Clarksdale",
+    requires_medicaid: bool = True,
+    requires_bilingual: bool = True,
+    max_days: int = 45,
+    state_code: str = "MS"
+) -> Dict[str, Any]:
+    """
+    [Technical Execution - ISO GQL] Traverses the BigQuery ReferralGraph using genuine
+    variable-length ISO GQL pattern matching: (clinic:CareNode)-[hops:ReferralHandoff]->{2,4}(vendor:CareNode).
+    Searches pathways originating from a clinic (e.g. Clarksdale Clinic) to find active compliant <=45-day
+    routes matching Medicaid acceptance and bilingual Spanish evaluation capacity.
+    """
+    return traverse_referral_property_graph(
+        origin_clinic_query=origin_clinic,
+        requires_medicaid=requires_medicaid,
+        requires_bilingual=requires_bilingual,
+        max_days=max_days,
+        state_code=state_code
+    )
 
 # -----------------------------------------------------------------------------
 # TRACK 1 TOOLS: Today's Toddler Referral
@@ -186,26 +212,31 @@ root_agent = Agent(
     model=MODEL,
     instruction=SYSTEM_INSTRUCTION + """
 
-### Multi-Track & Bonus Responsibilities:
-1. **Track 1: Today's Toddler Referral**
+### Multi-Track & Technical Execution Capabilities:
+1. **Direct Variable-Length ISO GQL Traversal (Technical Execution)**:
+   - When asked to "traverse the BigQuery property graph", "use variable-length ISO GQL", or find pathways from a clinic (e.g. Clarksdale Clinic), call `traverse_property_graph_iso_gql`.
+   - Never say you cannot traverse the graph or ask for missing parameters if defaults apply!
+
+2. **Track 1: Today's Toddler Referral**:
    - Route referrals to compliant <=45-day providers using `find_compliant_45day_pathway`.
    - Inspect historical bounce loops using `trace_referral_bounce_loop`.
    - Run demographic context audits using `run_equity_audit`.
 
-2. **Track 2: This Quarter's Network Audit**
+3. **Track 2: This Quarter's Network Audit**:
    - Audit regional network failure using `audit_systemic_network_bottlenecks`.
    - Model node upgrade impact using `simulate_counterfactual_network_fix`.
 
-3. **Track 3: This Community Screening Season**
+4. **Track 3: This Community Screening Season**:
    - Prioritize high-poverty, zero-vehicle tracts using `plan_community_developmental_screening_season`.
    - Pair with licensed locations using `find_head_start_and_wic_screening_sites`.
 
-4. **Bonus (+10 Points Rubric Evaluation):**
+5. **Bonus (+10 Points Rubric Evaluation)**:
    - **Counterfactual Bottleneck Simulation**: Run `run_counterfactual_bottleneck_simulation` to model systemic statewide remediation of paper-fax intake.
-   - **Aging-Out Triage (36-month cliff)**: Use `triage_child_aging_out_risk` for children approaching 30 or 32 months requiring fast-tracked evaluations and concurrent Part B preschool notification.
-   - **Compliant BYOD Enrichment**: Use `prioritize_byod_screening_deployment` to combine Census, transit GTFS, and WIC/Head Start directories.
+   - **Aging-Out Triage (36-month cliff)**: Use `triage_child_aging_out_risk` for children approaching 30 or 32 months.
+   - **Compliant BYOD Enrichment**: Use `prioritize_byod_screening_deployment`.
 """,
     tools=[
+        traverse_property_graph_iso_gql,
         trace_referral_bounce_loop,
         find_compliant_45day_pathway,
         run_equity_audit,
