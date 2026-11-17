@@ -30,6 +30,12 @@ from agent.tools.advanced_extensions import (
     find_community_screening_sites,
     reserve_evaluation_slot
 )
+from agent.security.privacy_guard import (
+    deidentify_candidate_record,
+    sanitize_handoff_reason,
+    mask_identifier,
+    generalize_tract
+)
 
 app = FastAPI(title="Early Intervention 45-Day Pathway & Triage Assistant")
 
@@ -257,10 +263,9 @@ CANDIDATES_REGISTRY = [
 
 @app.get("/api/candidates")
 def api_get_candidates(state: Optional[str] = None):
-    """Returns candidate cases dynamically."""
-    if state:
-        return [c for c in CANDIDATES_REGISTRY if c["state_code"] == state]
-    return CANDIDATES_REGISTRY
+    """Returns candidate cases dynamically with HIPAA/FERPA privacy-preserving de-identification."""
+    candidates = [c for c in CANDIDATES_REGISTRY if not state or c["state_code"] == state]
+    return [deidentify_candidate_record(c) for c in candidates]
 
 @app.get("/api/pathways/compare")
 def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
@@ -341,9 +346,12 @@ def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
         "instead of Intake Hub SYN-PROV-MS-009, which triggers paper-fax 3-hop bounce loops taking 76 days."
     )
     
+    safe_cand = deidentify_candidate_record(cand)
+    
     return {
-        "candidate": cand,
+        "candidate": safe_cand,
         "insights": insights_text,
+        "privacy_audit": safe_cand.get("privacy_metadata"),
         "recommended_path": {
             "is_within_limit": ai_total_days <= 45,
             "estimated_total_days": ai_total_days,
