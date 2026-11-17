@@ -3,27 +3,21 @@ import { FilterBar } from "./components/FilterBar.js";
 import { CandidateSummaryBar, AiInsightsBanner } from "./components/CandidateAndInsights.js";
 import { PathwayComparison } from "./components/PathwayComparison.js";
 import { GoogleCloudAssist } from "./components/GoogleCloudAssist.js";
-import { NetworkAuditPanel, ScreeningSeasonPanel } from "./components/TrackPanels.js";
 
 class App {
   constructor() {
-    this.currentTrack = "new_case"; // "new_case" (Track 1), "network_audit" (Track 2), "screening_season" (Track 3)
     this.currentCandidate = "Mateo S.";
     this.currentState = "MS";
     this.candidateData = {};
     this.pathwayData = {};
-    this.auditData = {};
-    this.screeningData = {};
-    this.isLoadingChat = false;
-    this.quickChipsCollapsed = false;
     this.chatMessages = [
       {
         sender: "user",
-        text: "How does the assistant coordinate all 3 IDEA Part C tracks under the federal 45-day clock?"
+        text: "Why does Intake Hub 012 look healthy but still cause 45-day breaches?"
       },
       {
         sender: "ai",
-        text: "Welcome! Our assistant coordinates across all 3 tracks:\n• Track 1: Routes 20-month toddlers like Mateo S. to bilingual Medicaid evaluators under 45 days.\n• Track 2: Audits regional networks, exposing 3-hop paper-fax bounce hubs.\n• Track 3: Prioritizes high-poverty zero-vehicle tracts for community screening only when downstream <=45-day capacity is strictly verified."
+        text: "Intake Hub 012 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But 28% of similar cases are re-routed due to paper fax and eligibility mismatches, adding ~11 extra days and often pushing the total over 45 days."
       }
     ];
   }
@@ -36,19 +30,11 @@ class App {
 
   async fetchData() {
     try {
-      if (this.currentTrack === "new_case") {
-        const res = await fetch(`/api/pathways/compare?candidate_name=${encodeURIComponent(this.currentCandidate)}&state=${this.currentState}`);
-        this.pathwayData = await res.json();
-        this.candidateData = this.pathwayData.candidate || {};
-      } else if (this.currentTrack === "network_audit") {
-        const res = await fetch(`/api/tracks/network-audit?state=${this.currentState}`);
-        this.auditData = await res.json();
-      } else if (this.currentTrack === "screening_season") {
-        const res = await fetch(`/api/tracks/screening-season?state=${this.currentState}`);
-        this.screeningData = await res.json();
-      }
+      const res = await fetch(`/api/pathways/compare?candidate_name=${encodeURIComponent(this.currentCandidate)}&state=${this.currentState}`);
+      this.pathwayData = await res.json();
+      this.candidateData = this.pathwayData.candidate || {};
     } catch (e) {
-      console.error("Failed to load track data:", e);
+      console.error("Failed to load pathway data:", e);
     }
   }
 
@@ -56,28 +42,21 @@ class App {
     const root = document.getElementById("app-root");
     if (!root) return;
 
-    const topBar = new TopAppBar(this.getStateName(this.currentState));
-    const filterBar = new FilterBar([], this.currentCandidate, this.currentState, this.currentTrack);
-    const assist = new GoogleCloudAssist(this.chatMessages, this.currentTrack);
-
-    let mainLeftContent = "";
-
-    if (this.currentTrack === "new_case") {
-      const candidateSummary = new CandidateSummaryBar(this.candidateData);
-      const aiInsights = new AiInsightsBanner(this.pathwayData.insights);
-      const pathwayComp = new PathwayComparison(this.pathwayData);
-      mainLeftContent = `
-        ${candidateSummary.render()}
-        ${aiInsights.render()}
-        ${pathwayComp.render()}
-      `;
-    } else if (this.currentTrack === "network_audit") {
-      const auditPanel = new NetworkAuditPanel(this.auditData);
-      mainLeftContent = auditPanel.render();
-    } else if (this.currentTrack === "screening_season") {
-      const screeningPanel = new ScreeningSeasonPanel(this.screeningData);
-      mainLeftContent = screeningPanel.render();
-    }
+    const stateNames = {
+      "MS": "Mississippi (MS)",
+      "AL": "Alabama (AL)",
+      "GA": "Georgia (GA)",
+      "TX": "Texas (TX)",
+      "CA": "California (CA)",
+      "NY": "New York (NY)"
+    };
+    const currentFullStateName = stateNames[this.currentState] || "Mississippi (MS)";
+    const topBar = new TopAppBar(currentFullStateName);
+    const filterBar = new FilterBar([], this.currentCandidate, this.currentState);
+    const candidateSummary = new CandidateSummaryBar(this.candidateData);
+    const aiInsights = new AiInsightsBanner(this.pathwayData.insights);
+    const pathwayComp = new PathwayComparison(this.pathwayData);
+    const assist = new GoogleCloudAssist(this.chatMessages);
 
     root.innerHTML = `
       <div class="app-container">
@@ -85,12 +64,14 @@ class App {
         ${filterBar.render()}
 
         <main class="main-content">
-          <!-- Left Column (Active Track View) -->
+          <!-- Left Column -->
           <div class="left-col">
-            ${mainLeftContent}
+            ${candidateSummary.render()}
+            ${aiInsights.render()}
+            ${pathwayComp.render()}
           </div>
 
-          <!-- Right Column (Conversational ADK Co-Pilot) -->
+          <!-- Right Column -->
           <div class="right-col">
             ${assist.render()}
           </div>
@@ -99,33 +80,20 @@ class App {
     `;
   }
 
-  getStateName(code) {
-    const map = {
-      MS: "Mississippi (MS)",
-      AL: "Alabama (AL)",
-      GA: "Georgia (GA)",
-      TX: "Texas (TX)",
-      CA: "California (CA)",
-      NY: "New York (NY)"
-    };
-    return map[code] || `${code}`;
-  }
-
   bindEvents() {
-    // Task Mode Track Selector Change
-    const taskModeSelect = document.getElementById("select-task-mode");
-    if (taskModeSelect) {
-      taskModeSelect.value = this.currentTrack;
-      taskModeSelect.addEventListener("change", async (e) => {
-        this.currentTrack = e.target.value;
-        await this.handleTrackSwitch();
-      });
-    }
-
     // Analyze button
     const btnAnalyze = document.getElementById("btn-analyze-pathways");
     if (btnAnalyze) {
       btnAnalyze.addEventListener("click", () => this.handleAnalyze());
+    }
+
+    // Candidate select dropdown
+    const candSelect = document.getElementById("select-candidate-dropdown");
+    if (candSelect) {
+      candSelect.addEventListener("change", (e) => {
+        this.currentCandidate = e.target.value;
+        this.handleAnalyze();
+      });
     }
 
     // Input Candidate enter key
@@ -158,39 +126,14 @@ class App {
     }
 
     // Chat input
-    this.bindChatEvents();
-  }
-
-  bindChatEvents() {
     const chatInput = document.getElementById("assist-input-field");
     const sendBtn = document.getElementById("btn-send-chat");
     if (chatInput && sendBtn) {
-      sendBtn.onclick = () => this.handleSendChat();
-      chatInput.onkeydown = (e) => {
+      sendBtn.addEventListener("click", () => this.handleSendChat());
+      chatInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") this.handleSendChat();
-      };
+      });
     }
-  }
-
-  toggleQuickChips() {
-    const container = document.getElementById("quick-chips-container");
-    const icon = document.getElementById("quick-chips-toggle-icon");
-    if (!container || !icon) return;
-
-    this.quickChipsCollapsed = !this.quickChipsCollapsed;
-    if (this.quickChipsCollapsed) {
-      container.style.display = "none";
-      icon.textContent = "expand_more";
-    } else {
-      container.style.display = "flex";
-      icon.textContent = "expand_less";
-    }
-  }
-
-  async handleTrackSwitch() {
-    await this.fetchData();
-    this.render();
-    this.bindEvents();
   }
 
   async handleAnalyze() {
@@ -199,7 +142,7 @@ class App {
       this.currentCandidate = candInput.value.trim();
     }
     const btn = document.getElementById("btn-analyze-pathways");
-    if (btn) btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Updating...`;
+    if (btn) btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Analyzing...`;
 
     await this.fetchData();
     this.render();
@@ -207,30 +150,43 @@ class App {
   }
 
   toggleAccordion(type) {
-    const body = document.getElementById(`body-${type}`);
-    const arrow = document.getElementById(`arrow-${type}`);
-    const header = document.getElementById(`header-${type}`);
-    if (!body || !arrow || !header) return;
+    const bodyRec = document.getElementById("body-rec");
+    const arrowRec = document.getElementById("arrow-rec");
+    const headerRec = document.getElementById("header-rec");
 
-    if (body.style.display === "none") {
-      body.style.display = "block";
-      arrow.textContent = "expand_more";
-      header.classList.add("open");
-    } else {
-      body.style.display = "none";
-      arrow.textContent = "chevron_right";
-      header.classList.remove("open");
+    const bodyUsual = document.getElementById("body-usual");
+    const arrowUsual = document.getElementById("arrow-usual");
+    const headerUsual = document.getElementById("header-usual");
+
+    // Only one path table should be expanded at a time
+    if (type === "rec") {
+      const isCurrentlyOpen = bodyRec.style.display !== "none";
+      if (!isCurrentlyOpen) {
+        bodyRec.style.display = "block";
+        arrowRec.textContent = "expand_more";
+        headerRec.classList.add("open");
+
+        bodyUsual.style.display = "none";
+        arrowUsual.textContent = "chevron_right";
+        headerUsual.classList.remove("open");
+      }
+    } else if (type === "usual") {
+      const isCurrentlyOpen = bodyUsual.style.display !== "none";
+      if (!isCurrentlyOpen) {
+        bodyUsual.style.display = "block";
+        arrowUsual.textContent = "expand_more";
+        headerUsual.classList.add("open");
+
+        bodyRec.style.display = "none";
+        arrowRec.textContent = "chevron_right";
+        headerRec.classList.remove("open");
+      }
     }
   }
 
   async askPrompt(promptText) {
     if (!promptText || !promptText.trim()) return;
-    if (this.isLoadingChat) return;
-
-    this.isLoadingChat = true;
     this.chatMessages.push({ sender: "user", text: promptText.trim() });
-    
-    // Add temporary loading indicator
     this.chatMessages.push({ sender: "ai", text: "Analyzing across BigQuery & Property Graph..." });
     this.updateChatUI();
 
@@ -241,16 +197,12 @@ class App {
         body: JSON.stringify({ query: promptText.trim(), state: this.currentState })
       });
       const data = await res.json();
-      
-      // Replace the loading message with the real answer
-      this.chatMessages.pop();
+      this.chatMessages.pop(); // remove loading indicator
       this.chatMessages.push({ sender: "ai", text: data.answer || "No response received." });
     } catch (e) {
-      console.error("Chat error:", e);
       this.chatMessages.pop();
-      this.chatMessages.push({ sender: "ai", text: "Error: Unable to connect to the backend agent server." });
+      this.chatMessages.push({ sender: "ai", text: "Error connecting to backend ADK Agent." });
     } finally {
-      this.isLoadingChat = false;
       this.updateChatUI();
     }
   }
@@ -266,23 +218,20 @@ class App {
   updateChatUI() {
     const root = document.querySelector(".right-col");
     if (root) {
-      const assist = new GoogleCloudAssist(this.chatMessages, this.currentTrack);
+      const assist = new GoogleCloudAssist(this.chatMessages);
       root.innerHTML = assist.render();
-      this.bindChatEvents();
-      
-      // Preserve quick chips collapsed state if toggled
-      if (this.quickChipsCollapsed) {
-        const container = document.getElementById("quick-chips-container");
-        const icon = document.getElementById("quick-chips-toggle-icon");
-        if (container) container.style.display = "none";
-        if (icon) icon.textContent = "expand_more";
+      // re-bind chat events
+      const chatInput = document.getElementById("assist-input-field");
+      const sendBtn = document.getElementById("btn-send-chat");
+      if (chatInput && sendBtn) {
+        sendBtn.addEventListener("click", () => this.handleSendChat());
+        chatInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") this.handleSendChat();
+        });
       }
-
-      // Automatically scroll to the latest message so response is immediately visible
+      // scroll to bottom
       const history = document.getElementById("assist-chat-history");
-      if (history) {
-        history.scrollTop = history.scrollHeight;
-      }
+      if (history) history.scrollTop = history.scrollHeight;
     }
   }
 }
