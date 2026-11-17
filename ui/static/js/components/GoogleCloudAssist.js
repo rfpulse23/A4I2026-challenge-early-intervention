@@ -3,11 +3,11 @@ export class GoogleCloudAssist {
     this.messages = messages.length > 0 ? messages : [
       {
         sender: "user",
-        text: "Why does Intake Hub 009 look healthy but still cause 45-day breaches?"
+        text: "How does the assistant coordinate all 3 IDEA Part C tracks under the federal 45-day clock?"
       },
       {
         sender: "ai",
-        text: "Intake Hub 009 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But paper faxes forwarded without language verification cause 3-hop bounce loops taking 76 days, breaching federal compliance by 31 days!"
+        text: "Welcome! Our assistant coordinates across all 3 tracks:\n• Track 1: Routes 20-month toddlers like Mateo S. to bilingual Medicaid evaluators under 45 days.\n• Track 2: Audits regional networks, exposing 3-hop paper-fax bounce hubs.\n• Track 3: Prioritizes high-poverty zero-vehicle tracts for community screening only when downstream <=45-day capacity is strictly verified."
       }
     ];
     this.activeTrack = activeTrack;
@@ -94,7 +94,7 @@ export class GoogleCloudAssist {
             <span class="material-symbols-outlined">auto_awesome</span>
             <span>Google Cloud Assist</span>
           </div>
-          <span class="adk-badge">Conversational ADK Agent</span>
+          <span class="adk-badge">Live ADK Agent</span>
         </div>
 
         <div class="assist-scroll-content" id="assist-chat-history">
@@ -114,8 +114,8 @@ export class GoogleCloudAssist {
           <div class="quick-questions-section">
             <div class="quick-title">Quick Actions for this Track...</div>
             <div class="quick-list">
-              ${quickQuestions.map(q => `
-                <button class="quick-item-btn" onclick="window.app.askPrompt('${q.prompt.replace(/'/g, "\\'")}')">
+              ${quickQuestions.map((q, idx) => `
+                <button class="quick-item-btn" data-prompt-idx="${idx}" onclick="window.app.askPrompt(this.getAttribute('data-prompt'))" data-prompt="${q.prompt.replace(/"/g, '&quot;')}">
                   <span class="material-symbols-outlined">${q.icon}</span>
                   <span>${q.text}</span>
                   <span class="material-symbols-outlined quick-arrow">chevron_right</span>
@@ -127,7 +127,7 @@ export class GoogleCloudAssist {
 
         <!-- Input Bar -->
         <div class="assist-input-bar">
-          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a question about this track..." />
+          <input type="text" class="assist-input" id="assist-input-field" placeholder="Ask a question about this track..." autocomplete="off" />
           <button class="send-btn" id="btn-send-chat" title="Send">
             <span class="material-symbols-outlined">send</span>
           </button>
