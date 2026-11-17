@@ -1,27 +1,45 @@
 import re
 from pathlib import Path
 
-server_path = Path("/config/A4I2026-challenge-early-intervention/ui/server.py")
-content = server_path.read_text(encoding="utf-8")
+p = Path("/config/A4I2026-challenge-early-intervention/ui/server.py")
+content = p.read_text(encoding="utf-8")
 
-# Add import agent_bridge near the top
-import_stmt = "from agent_bridge import bridge\n"
-if "from agent_bridge import bridge" not in content:
-    content = content.replace("from agent.tools.advanced_extensions import (", import_stmt + "from agent.tools.advanced_extensions import (")
-
-# Replace api_chat implementation to call bridge.ask
-new_api_chat = '''@app.post("/api/chat")
+old_code = '''@app.post("/api/chat")
 async def api_chat(payload: ChatQuery):
-    answer = await bridge.ask(query=payload.query, state_code=payload.state)
-    return {"answer": answer}
-'''
+    """
+    Connects the UI chat window directly to the live autonomous Google ADK Agent
+    equipped with all 13 tools across all 3 tracks + bonus extensions.
+    """
+    result = await bridge.ask(query=payload.query, state_code=payload.state)
+    if isinstance(result, dict) and "answer" in result:
+        return result
+    return {"answer": str(result)}'''
 
-content = re.sub(
-    r'@app\.post\("/api/chat"\)\s+def api_chat\(payload: ChatQuery\):.*?(?=@app\.get\("/", response_class=HTMLResponse\))',
-    new_api_chat + "\n",
-    content,
-    flags=re.DOTALL
-)
+new_code = '''@app.post("/api/chat")
+async def api_chat(payload: ChatQuery):
+    """
+    Connects the UI chat window directly to the live autonomous Google ADK Agent
+    and returns both the agent answer and dynamic UI update for the left side of the dashboard.
+    """
+    result = await bridge.ask(query=payload.query, state_code=payload.state)
+    if isinstance(result, dict):
+        return {
+            "answer": result.get("answer", ""),
+            "ui_update": result.get("ui_update", None)
+        }
+    return {"answer": str(result), "ui_update": None}'''
 
-server_path.write_text(content, encoding="utf-8")
-print("ui/server.py updated to call live ADK Agent Bridge!")
+if old_code in content:
+    content = content.replace(old_code, new_code)
+    p.write_text(content, encoding="utf-8")
+    print("Successfully patched ui/server.py api_chat to return ui_update!")
+else:
+    print("Could not find exact old_code block in ui/server.py, applying regex replacement...")
+    content = re.sub(
+        r'@app\.post\("/api/chat"\)\s+async def api_chat\(payload: ChatQuery\):.*?(?=@app\.get\("/", response_class=HTMLResponse\))',
+        new_code + "\n\n",
+        content,
+        flags=re.DOTALL
+    )
+    p.write_text(content, encoding="utf-8")
+    print("Applied regex replacement in ui/server.py!")

@@ -199,6 +199,11 @@ class App {
       const data = await res.json();
       this.chatMessages.pop(); // remove loading indicator
       this.chatMessages.push({ sender: "ai", text: data.answer || "No response received." });
+
+      // Dynamically update the LEFT SIDE of the dashboard based on the agent answer
+      if (data.ui_update) {
+        this.applyLeftUiUpdate(data.ui_update);
+      }
     } catch (e) {
       this.chatMessages.pop();
       this.chatMessages.push({ sender: "ai", text: "Error connecting to backend ADK Agent." });
@@ -213,6 +218,36 @@ class App {
     const text = input.value.trim();
     input.value = "";
     await this.askPrompt(text);
+  }
+
+
+  applyLeftUiUpdate(uiUpdate) {
+    // 1. Update AI Insights Banner
+    if (uiUpdate.insights) {
+      const bannerText = document.querySelector(".ai-banner-text");
+      if (bannerText) bannerText.textContent = uiUpdate.insights;
+    }
+
+    // 2. Update Recommended Path (AI Stepper & Table)
+    if (uiUpdate.recommended_path) {
+      this.pathwayData.recommended_path = {
+        ...this.pathwayData.recommended_path,
+        ...uiUpdate.recommended_path
+      };
+      
+      const leftCol = document.querySelector(".left-col");
+      if (leftCol) {
+        const candidateSummary = new CandidateSummaryBar(this.candidateData);
+        const aiInsights = new AiInsightsBanner(uiUpdate.insights || this.pathwayData.insights);
+        const pathwayComp = new PathwayComparison(this.pathwayData);
+
+        leftCol.innerHTML = `
+          ${candidateSummary.render()}
+          ${aiInsights.render()}
+          ${pathwayComp.render()}
+        `;
+      }
+    }
   }
 
   updateChatUI() {

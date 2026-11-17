@@ -18,13 +18,13 @@ export class GoogleCloudAssist {
         <div class="assist-header">
           <div class="assist-brand">
             <span class="material-symbols-outlined">auto_awesome</span>
-            <span>Google Cloud Assist</span>
+            <span>Early Intervention Co-Pilot</span>
           </div>
-          <span class="adk-badge">Conversational ADK Agent</span>
+          <span class="adk-badge">45-Day Statutory Triage</span>
         </div>
 
         <div class="assist-scroll-content" id="assist-chat-history">
-          <!-- Chat Bubbles -->
+          <!-- Chat Bubbles Only: Zero obstruction, full scroll area -->
           ${this.messages.map(m => `
             <div class="chat-msg ${m.sender}">
               <div class="chat-avatar ${m.sender === 'user' ? 'user-avatar' : 'ai-avatar'}">
@@ -35,36 +35,6 @@ export class GoogleCloudAssist {
               </div>
             </div>
           `).join('')}
-
-          <!-- Quick Actions for Track 1 -->
-          <div class="quick-questions-section">
-            <div class="quick-title">Quick Actions for this Track...</div>
-            <div class="quick-list">
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Traverse the property graph using ISO GQL from Clarksdale Clinic.')">
-                <span class="material-symbols-outlined">hub</span>
-                <span>Traverse the property graph using ISO GQL from Clarksdale Clinic.</span>
-                <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-              </button>
-
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Can a zero-vehicle caregiver reach the evaluation hub by public bus?')">
-                <span class="material-symbols-outlined">directions_bus</span>
-                <span>Can a zero-vehicle caregiver reach the evaluation hub by public bus?</span>
-                <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-              </button>
-
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Lock an evaluation slot with an ACID reservation token.')">
-                <span class="material-symbols-outlined">lock</span>
-                <span>Lock an evaluation slot with an ACID reservation token.</span>
-                <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-              </button>
-
-              <button class="quick-item-btn" onclick="window.app.askPrompt('Generate a bilingual caregiver action note (English & Spanish).')">
-                <span class="material-symbols-outlined">description</span>
-                <span>Generate a bilingual caregiver action note (English & Spanish).</span>
-                <span class="material-symbols-outlined quick-arrow">chevron_right</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- Input Bar -->
