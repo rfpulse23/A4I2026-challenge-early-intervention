@@ -25,3 +25,4 @@ Thumbs.db
 *.parquet
 !data/*.parquet
 *.csv.gz
+.adk/
