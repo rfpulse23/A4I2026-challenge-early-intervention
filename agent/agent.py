@@ -9,6 +9,7 @@ Equipped with all 3 Official Tracks + All 3 Official Bonus Extensions (+10 Point
 - Bonus 2 (+10): Aging-Out Triage (Query 5: 36-Month Transition Cliff & LEA Notification)
 - Bonus 3 (+10): Compliant BYOD Enrichment (Query 6: Head Start, WIC, and GTFS transit guardrails)
 - Technical Execution: Direct ISO GQL Variable-Length Property Graph Traversal
+- Craft & Communication: ACID Reservation Lock & Defending the ADK Web Interface
 """
 import os
 import sys
@@ -77,6 +78,7 @@ def trace_referral_bounce_loop(case_chain_id: str = "CHAIN-MS-009", state_code: 
     """
     [Track 1] Traces multi-hop referral chains over BigQuery referral logs to diagnose paper-fax bottlenecks
     and 3-hop bounce loops that breach the federal 45-day IDEA Part C clock.
+    Defaults to benchmark Mississippi Delta case 'CHAIN-MS-009'.
     """
     return trace_referral_chain(state_code=state_code, case_chain_id=case_chain_id)
 
@@ -90,6 +92,7 @@ def find_compliant_45day_pathway(
     """
     [Track 1] Finds a verified <=45-day compliant pathway connecting an origin clinic, electronic coordinator hub,
     multidisciplinary evaluation hub, and therapy vendor matching Medicaid and bilingual requirements.
+    Defaults to 20-month toddler in Bolivar County (tract 28011950701).
     """
     return find_compliant_pathway(
         child_age_months=child_age_months,
@@ -197,6 +200,7 @@ def reserve_live_evaluation_slot(
 ) -> Dict[str, Any]:
     """
     [Extension 3] Atomically reserves a live evaluation slot with an ACID lock, preventing concurrent coordinators from double-booking.
+    All parameters have benchmark defaults (CHAIN-MS-009, 20 months, SYN-PROV-MS-019, COORD-CLARKSDALE-01).
     """
     return reserve_evaluation_slot(
         case_chain_id=case_chain_id,
@@ -212,28 +216,14 @@ root_agent = Agent(
     model=MODEL,
     instruction=SYSTEM_INSTRUCTION + """
 
-### Multi-Track & Technical Execution Capabilities:
-1. **Direct Variable-Length ISO GQL Traversal (Technical Execution)**:
-   - When asked to "traverse the BigQuery property graph", "use variable-length ISO GQL", or find pathways from a clinic (e.g. Clarksdale Clinic), call `traverse_property_graph_iso_gql`.
-   - Never say you cannot traverse the graph or ask for missing parameters if defaults apply!
-
-2. **Track 1: Today's Toddler Referral**:
-   - Route referrals to compliant <=45-day providers using `find_compliant_45day_pathway`.
-   - Inspect historical bounce loops using `trace_referral_bounce_loop`.
-   - Run demographic context audits using `run_equity_audit`.
-
-3. **Track 2: This Quarter's Network Audit**:
-   - Audit regional network failure using `audit_systemic_network_bottlenecks`.
-   - Model node upgrade impact using `simulate_counterfactual_network_fix`.
-
-4. **Track 3: This Community Screening Season**:
-   - Prioritize high-poverty, zero-vehicle tracts using `plan_community_developmental_screening_season`.
-   - Pair with licensed locations using `find_head_start_and_wic_screening_sites`.
-
-5. **Bonus (+10 Points Rubric Evaluation)**:
-   - **Counterfactual Bottleneck Simulation**: Run `run_counterfactual_bottleneck_simulation` to model systemic statewide remediation of paper-fax intake.
-   - **Aging-Out Triage (36-month cliff)**: Use `triage_child_aging_out_risk` for children approaching 30 or 32 months.
-   - **Compliant BYOD Enrichment**: Use `prioritize_byod_screening_deployment`.
+### Operational Workflow Guidelines:
+1. **Never stall or interrogate the user for missing details.**
+   - If asked to display latency breakdown, call `trace_referral_bounce_loop` or `find_compliant_45day_pathway` with defaults (`CHAIN-MS-009`).
+   - If asked to reserve an evaluation slot with an ACID lock, call `reserve_live_evaluation_slot` immediately using its default arguments.
+   - If asked to "defend your choice of the ADK Web interface," provide the full clinical and operational defense outlined in Principle 8:
+     * Eliminates coordinator cognitive overload by unifying complex ISO GQL graph traversals into a natural language workflow.
+     * Generates real-time, compassionate bilingual family action notes so coordinators don't have to draft correspondence from scratch.
+     * Enforces concurrency safety via atomic ACID slot locks so two coordinators never double-book scarce bilingual evaluators.
 """,
     tools=[
         traverse_property_graph_iso_gql,
