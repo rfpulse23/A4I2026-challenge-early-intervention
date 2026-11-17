@@ -25,7 +25,7 @@ except ImportError:
 # 1. Zero-Vehicle Transit Feasibility Tool (Using tract_transit_guardrails)
 # -----------------------------------------------------------------------------
 def check_zero_vehicle_transit_feasibility(
-    origin_tract_geoid: str,
+    origin_tract_geoid: str = "28011950701",
     target_hub_id: str = "SYN-PROV-MS-019",
     max_bus_transfers: int = 2
 ) -> Dict[str, Any]:
@@ -33,8 +33,44 @@ def check_zero_vehicle_transit_feasibility(
     Evaluates whether a zero-vehicle caregiver can reach the multidisciplinary evaluation hub
     by querying the `tract_transit_guardrails` table in BigQuery, calculating spatial transit distance,
     and assessing Medicaid Non-Emergency Transportation (NEMT) eligibility.
+    Accepts 11-digit GEOIDs OR plain county/city names (e.g. 'Bolivar County', 'Cleveland', 'Greenwood').
     """
     con = duckdb.connect()
+    
+    # Resolve location (city, county name, or plain language) to tract GEOID
+    if not origin_tract_geoid or not str(origin_tract_geoid).isdigit() or len(str(origin_tract_geoid)) != 11:
+        raw_input = str(origin_tract_geoid).strip() if origin_tract_geoid else "Bolivar"
+        clean_input = raw_input.replace("County", "").replace("county", "").strip()
+        
+        # 1. Check if input matches a known city in the provider directory to find its county
+        city_lookup = con.execute(f"""
+            SELECT county_name FROM '{DATA_DIR}/pediatric_and_ei_provider_directory.parquet'
+            WHERE city ILIKE '%{clean_input}%'
+            LIMIT 1
+        """).fetchone()
+        
+        target_county = city_lookup[0] if city_lookup else clean_input
+        target_county = target_county.replace("County", "").replace("county", "").strip()
+
+        # 2. Find highest transit burden tract in that county
+        resolved = con.execute(f"""
+            SELECT census_tract_geoid FROM '{DATA_DIR}/acs_under5_tract_demographics.parquet'
+            WHERE county_name ILIKE '%{target_county}%'
+            ORDER BY no_vehicle_rate DESC
+            LIMIT 1
+        """).fetchone()
+        origin_tract_geoid = resolved[0] if resolved else "28011950701"
+
+    # Resolve target hub name or city to provider ID
+    if not target_hub_id or not str(target_hub_id).startswith("SYN-PROV-"):
+        search_hub = str(target_hub_id).strip() if target_hub_id else "Greenwood"
+        resolved_hub = con.execute(f"""
+            SELECT provider_id FROM '{DATA_DIR}/pediatric_and_ei_provider_directory.parquet'
+            WHERE node_role = 'Multidisciplinary_Eval_Hub'
+              AND (synthetic_organization_name ILIKE '%{search_hub}%' OR city ILIKE '%{search_hub}%')
+            LIMIT 1
+        """).fetchone()
+        target_hub_id = resolved_hub[0] if resolved_hub else "SYN-PROV-MS-019"
     
     # 1. Query transit guardrails table
     county_name = "Unknown"
