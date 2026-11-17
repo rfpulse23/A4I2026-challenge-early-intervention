@@ -18,9 +18,9 @@ export class GoogleCloudAssist {
         <div class="assist-header">
           <div class="assist-brand">
             <span class="material-symbols-outlined">auto_awesome</span>
-            <span>Google Cloud Assist</span>
+            <span>Early Intervention Co-Pilot</span>
           </div>
-          <span class="adk-badge">Conversational ADK Agent</span>
+          <span class="adk-badge">45-Day Statutory Triage</span>
         </div>
 
         <div class="assist-scroll-content" id="assist-chat-history">
