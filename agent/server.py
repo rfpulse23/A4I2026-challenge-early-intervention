@@ -1,10 +1,20 @@
-"""FastAPI & ADK HTTP Service for Cloud Run and Agent Runtime deployment."""
+"""FastAPI & ADK HTTP Service for Cloud Run and Agent Runtime deployment.
+
+Serves:
+- Model Context Protocol (MCP) SSE Endpoint: /mcp/sse & /mcp/messages
+- Interactive Web Chat UI: GET /
+- Swagger / OpenAPI Docs: GET /docs
+- REST Triage Brief API: POST /api/brief
+- REST Natural Language Query API: POST /api/chat
+- MCP Tools Discovery: GET /api/mcp/tools
+"""
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+
 from agent.main_agent import coordinator_service
 from agent.subagents.triage_agent import route_toddler_referral
 from agent.subagents.network_audit_agent import (
@@ -13,12 +23,18 @@ from agent.subagents.network_audit_agent import (
     simulate_hub_fix,
 )
 from agent.subagents.equity_screening_agent import run_census_tract_equity_audit
+from agent.mcp_server import mcp
 
 app = FastAPI(
-    title="First Milestones — Early Intervention Triage Agent API",
-    description="ADK-powered Early Intervention and Network-Audit Assistant for Mississippi IDEA Part C.",
-    version="1.0.0",
+    title="First Milestones — Early Intervention Triage Agent & MCP Server API",
+    description="ADK-powered Early Intervention and Network-Audit Assistant for Mississippi IDEA Part C with FastMCP SSE protocol integration.",
+    version="1.1.0",
 )
+
+# Mount FastMCP SSE Server at /mcp
+# This provides /mcp/sse (GET for SSE stream) and /mcp/messages (POST for JSON-RPC messages)
+mcp_asgi_app = mcp.http_app(transport="sse")
+app.mount("/mcp", mcp_asgi_app)
 
 
 class BriefRequest(BaseModel):
@@ -121,7 +137,51 @@ def process_coordinator_question(q: str) -> Dict[str, Any]:
 @app.get("/health")
 def health_check():
     """Liveness & readiness probe."""
-    return {"status": "healthy", "service": "first-milestones-ei-agent", "state": "MS"}
+    return {"status": "healthy", "service": "first-milestones-ei-agent", "state": "MS", "mcp_endpoint": "/mcp/sse"}
+
+
+@app.get("/api/mcp/tools")
+def list_mcp_tools():
+    """Returns metadata for all tools exposed over the Model Context Protocol (MCP)."""
+    return {
+        "mcp_server": "FirstMilestones-ReferralGraph-MCP",
+        "protocol": "Model Context Protocol (MCP) 2024-11-05",
+        "transport": "Server-Sent Events (SSE)",
+        "endpoints": {
+            "sse_connect": "/mcp/sse",
+            "messages_post": "/mcp/messages",
+        },
+        "tools": [
+            {
+                "name": "trace_referral_bounce_loop",
+                "description": "Traverses 2..4 hop referral chains using ISO GQL with case_chain_id correlation to diagnose multi-hop bounce loops exceeding 45 days.",
+            },
+            {
+                "name": "find_compliant_45day_pathway",
+                "description": "Discovers an optimal <=45-day compliant referral pathway for an incoming toddler matching age, Medicaid, and Spanish bilingual needs.",
+            },
+            {
+                "name": "diagnose_bounce_hubs",
+                "description": "Isolates regional coordinator hubs (e.g. SYN-PROV-MS-012) where deceptively low 5-day wait times conceal 70+ day multi-hop re-referrals.",
+            },
+            {
+                "name": "simulate_counterfactual_network_fix",
+                "description": "Simulates upgrading a paper-fax intake hub to an electronic e-referral portal, calculating delayed child-days saved.",
+            },
+            {
+                "name": "run_equity_audit",
+                "description": "Audits Census tract disparities, poverty rates, zero-vehicle transit friction, and data traps.",
+            },
+            {
+                "name": "generate_45_day_brief",
+                "description": "Compiles the full 5-part 45-Day Pathway & Bottleneck Brief for Mississippi IDEA Part C.",
+            },
+        ],
+        "resources": [
+            "referral://standards/idea-part-c",
+            "bigquery://dataset/a4i_early_intervention",
+        ],
+    }
 
 
 @app.post("/api/brief")
@@ -151,23 +211,28 @@ def chat_with_agent(req: ChatRequest):
 
 @app.get("/", response_class=HTMLResponse)
 def interactive_web_ui():
-    """Serves an interactive web chat UI directly in the browser."""
+    """Serves an interactive web chat UI directly in the browser with MCP badges and docs."""
     return """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>First Milestones — Early Intervention Triage Assistant</title>
+  <title>First Milestones — Early Intervention Triage Assistant & MCP Server</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; color: #1a202c; }
-    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; }
-    .header { background: #1a365d; color: white; padding: 20px 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; }
+    .header { background: #1a365d; color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
     .header h1 { margin: 0 0 6px 0; font-size: 22px; }
     .header p { margin: 0; font-size: 14px; opacity: 0.9; }
+    .badges { display: flex; gap: 8px; }
+    .badge { background: #2b6cb0; color: #bee3f8; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
+    .badge:hover { background: #2c5282; color: white; }
+    .mcp-bar { background: #2d3748; color: #e2e8f0; padding: 10px 24px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+    .mcp-code { font-family: monospace; background: #1a202c; padding: 2px 8px; border-radius: 4px; color: #68d391; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 24px; background: #edf2f7; border-bottom: 1px solid #e2e8f0; }
     .chip { background: white; border: 1px solid #cbd5e0; border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
     .chip:hover { background: #3182ce; color: white; border-color: #3182ce; }
-    .chat-box { height: 480px; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .chat-box { height: 460px; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .msg { padding: 14px 18px; border-radius: 10px; max-width: 85%; font-size: 14px; line-height: 1.5; }
     .user { align-self: flex-end; background: #3182ce; color: white; }
     .bot { align-self: flex-start; background: #f7fafc; border: 1px solid #e2e8f0; color: #2d3748; }
@@ -184,8 +249,19 @@ def interactive_web_ui():
 <body>
   <div class="container">
     <div class="header">
-      <h1>Early Intervention & Developmental Screening Triage (Mississippi)</h1>
-      <p>Agents for Impact 2026 • ADK Multi-Agent Assistant • BigQuery Property Graphs (ISO GQL)</p>
+      <div>
+        <h1>Early Intervention & Developmental Screening Triage (Mississippi)</h1>
+        <p>Agents for Impact 2026 • ADK Multi-Agent Assistant • BigQuery Property Graphs (ISO GQL)</p>
+      </div>
+      <div class="badges">
+        <a class="badge" href="/mcp/sse" target="_blank">MCP SSE Endpoint</a>
+        <a class="badge" href="/api/mcp/tools" target="_blank">MCP Tools JSON</a>
+        <a class="badge" href="/docs" target="_blank">Swagger API</a>
+      </div>
+    </div>
+    <div class="mcp-bar">
+      <span>Model Context Protocol (MCP) Server Live:</span>
+      <span>SSE URL: <span class="mcp-code">/mcp/sse</span> | Post Messages: <span class="mcp-code">/mcp/messages</span></span>
     </div>
     <div class="chips">
       <div class="chip" onclick="ask(this.innerText)">Trace the 3-to-4-hop referral chains breaching the 45-day limit</div>
@@ -196,7 +272,7 @@ def interactive_web_ui():
     </div>
     <div class="chat-box" id="chat">
       <div class="msg bot">
-        <strong>First Milestones Coordinator:</strong> Hello. I am your Early Intervention triage and network-audit assistant for Mississippi IDEA Part C. Click any recommended prompt above or enter your question below to explore multi-hop referral bottlenecks, prospective routing, or equity audits.
+        <strong>First Milestones Coordinator:</strong> Hello. I am your Early Intervention triage and network-audit assistant for Mississippi IDEA Part C. All tools and graph diagnostics are also exposed over standard <strong>Model Context Protocol (MCP)</strong> at <code>/mcp/sse</code>. Click any prompt above or enter your question below.
       </div>
     </div>
     <div class="input-bar">
