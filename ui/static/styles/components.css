@@ -435,8 +435,11 @@
   font-size: 11px;
   color: var(--md-on-surface-variant);
 }
-  font-size: 11px;
-  color: var(--md-on-surface-variant);
+
+.node-days-returned {
+  color: #b3261e !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
 }
 
 .flow-arrow {
