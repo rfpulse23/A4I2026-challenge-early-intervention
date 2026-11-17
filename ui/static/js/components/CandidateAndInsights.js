@@ -59,7 +59,7 @@ export class AiInsightsBanner {
           </button>
           <button class="copilot-chip" id="chip-lock-slot" onclick="window.app.triggerLockSlot()">
             <span class="material-symbols-outlined">lock</span>
-            <span id="label-lock-slot">Lock Slot (Hub 019)</span>
+            <span id="label-lock-slot">Lock Evaluation Slot</span>
           </button>
           <button class="copilot-chip" id="chip-check-transit" onclick="window.app.triggerTransitCheck()">
             <span class="material-symbols-outlined">directions_bus</span>

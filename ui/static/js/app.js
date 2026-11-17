@@ -216,9 +216,9 @@ class App {
       chip.classList.add("chip-active");
       const icon = chip.querySelector(".material-symbols-outlined");
       if (icon) icon.textContent = "check_circle";
-      label.textContent = "Locked: RES-8569C455";
+      label.textContent = "Slot Locked: RES-8569C455";
     }
-    this.askPrompt("Lock an evaluation slot with an ACID reservation token at Greenwood Eval Hub (SYN-PROV-MS-019).");
+    this.askPrompt("Lock an evaluation slot with an ACID reservation token for this candidate's recommended pathway.");
   }
 
   triggerTransitCheck() {
