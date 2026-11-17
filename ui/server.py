@@ -1,3 +1,4 @@
+from agent_bridge import bridge
 """
 FastAPI Server for Early Intervention 45-Day Pathway & Bottleneck Triage Dashboard.
 Serves interactive coordinator dashboard and dynamic JSON APIs (zero hardcode).
@@ -362,64 +363,15 @@ class ChatQuery(BaseModel):
     state: str = "MS"
 
 @app.post("/api/chat")
-def api_chat(payload: ChatQuery):
+async def api_chat(payload: ChatQuery):
     """
-    Handles conversational ADK questions and the 5 quick shortcuts.
+    Connects the UI chat window directly to the live autonomous Google ADK Agent
+    equipped with all 13 tools across all 3 tracks + bonus extensions.
     """
-    q = payload.query.lower()
-    
-    if "assist" in q or "coordinate" in q or "all 3" in q or "track 1" in q or "hello" in q or "welcome" in q:
-        return {
-            "answer": "Focusing on Track 1: Active Toddler Referral. For 20-month-old Mateo S. in Bolivar County, our system traverses BigQuery referral graphs to avoid paper-fax bounce loops (e.g. at Hub 009) and connects him directly to a verified bilingual Medicaid evaluation hub within 22 calendar days (well under the 45-day federal clock)."
-        }
-    elif "iso gql" in q or "traverse" in q or "clarksdale" in q:
-        return {
-            "answer": "Traversing property graph using ISO GQL: MATCH (clinic:CareNode {provider_id: 'SYN-PROV-MS-008'})-[hops:ReferralHandoff]->{2,4}(vendor:CareNode) WHERE accepts_medicaid=TRUE AND bilingual_services_listed=TRUE. Result: 22-day compliant electronic route via Indianola Intake -> Greenwood Eval Hub -> Greenville Therapy."
-        }
-    elif "transit" in q or "public bus" in q or "vehicle" in q:
-        return {
-            "answer": "Transit Guardrail (Bolivar County, GEOID 28011950701): 11.8% zero-vehicle households; distance to nearest bilingual eval hub is 18.2 km (no direct municipal bus line). Automated Directive: Dispatch Medicaid Non-Emergency Transportation (NEMT) or schedule Mobile Evaluation."
-        }
-    elif "lock" in q or "reservation" in q or "acid" in q:
-        return {
-            "answer": "ACID Reservation Lock Confirmed: Evaluation slot reserved at Greenwood Developmental Center (SYN-PROV-MS-019) for Mateo S. on Day 14. Token: RES-98F2A1. Concurrency guardrail prevents double-booking across coordinators."
-        }
-    elif "action note" in q or "caregiver" in q or "bilingual" in q:
-        return {
-            "answer": "Caregiver Action Note Generated:\n\n[English]: Dear Family, your 20-month-old child is scheduled for a bilingual developmental evaluation at Greenwood Center within 14 business days. Free Medicaid NEMT transportation is provided.\n\n[Español]: Estimada familia, su niño(a) de 20 meses tiene cita de evaluación bilingüe en el Centro Greenwood en 14 días laborables. Transporte gratuito de Medicaid disponible."
-        }
-    elif "healthy" in q or "intake hub 012" in q:
-        return {
-            "answer": "Intake Hub 012 has a short internal wait (median 5–6 days), so it looks healthy on a spreadsheet. But 28% of similar cases are re-routed due to paper fax and eligibility mismatches, adding ~11 extra days and often pushing the total over 45 days."
-        }
-    elif "breached 45" in q or "trace" in q:
-        diag = trace_referral_chain(payload.state)
-        return {
-            "answer": f"Analysis complete for {payload.state}: Traversed {diag['total_chains_analyzed']} multi-hop referral chains. {diag['breached_chains_count']} chains ({round(100 - diag['compliance_rate_pct'], 1)}%) breached the 45-day IDEA Part C limit. Top bottleneck is paper fax handoffs through regional coordinator hubs triggering 3-hop bounce loops."
-        }
-    elif "switch from paper fax" in q or "what if" in q:
-        sim = run_counterfactual_network_fix("SYN-PROV-MS-009", "upgrade_to_electronic_portal", payload.state)
-        return {
-            "answer": f"Counterfactual Simulation: Switching from paper fax to e-referral eliminates paper transmission latency, recovering {sim['affected_child_referral_chains']} referral chains into compliance and saving an aggregate of {sim['total_delayed_child_days_saved']} delayed child-days across the network."
-        }
-    elif "which intake hub saves" in q or "most delayed" in q:
-        bottlenecks = diagnose_systemic_bottlenecks(payload.state)
-        top = bottlenecks["top_regional_bounce_hubs"][0]
-        return {
-            "answer": f"Intake Hub {top['provider_id']} ({top['organization_name']}) is the #1 bounce hub. Remediation saves up to {top['downstream_wait_days_caused']} downstream delay days caused by paper-fax bounce loops."
-        }
-    elif "neighborhoods" in q or "which neighborhoods" in q:
-        return {
-            "answer": "Equity Audit Result: Rural Delta tracts (e.g. Bolivar County GEOID 28011950701) experience the highest breach rates. With 36.8% under-5 poverty and 11.8% zero-vehicle households, transit distance exceeds 20 km. Automated Medicaid Non-Emergency Transportation (NEMT) dispatch is recommended."
-        }
-    elif "caregiver action note" in q or "action note" in q:
-        return {
-            "answer": "Caregiver Action Note generated:\n\n[English]: Dear Family, your child's developmental evaluation is confirmed with Eval Hub 019 within 14 business days. Medicaid transportation (NEMT) is available at no cost.\n\n[Español]: Estimada familia, la evaluación de desarrollo de su niño(a) está confirmada con Eval Hub 019 dentro de 14 días laborables. Transporte gratuito de Medicaid disponible."
-        }
-    else:
-        return {
-            "answer": f"I analyzed your request regarding {payload.query}. Under IDEA Part C (34 CFR § 303.310), all referrals must achieve initial IFSP within 45 calendar days. I recommend prioritizing electronic coordinator handoffs to avoid paper-fax delay loops."
-        }
+    result = await bridge.ask(query=payload.query, state_code=payload.state)
+    if isinstance(result, dict) and "answer" in result:
+        return result
+    return {"answer": str(result)}
 
 @app.get("/", response_class=HTMLResponse)
 def index():

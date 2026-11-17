@@ -185,20 +185,24 @@ class App {
   }
 
   async askPrompt(promptText) {
-    this.chatMessages.push({ sender: "user", text: promptText });
+    if (!promptText || !promptText.trim()) return;
+    this.chatMessages.push({ sender: "user", text: promptText.trim() });
+    this.chatMessages.push({ sender: "ai", text: "Analyzing across BigQuery & Property Graph..." });
     this.updateChatUI();
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: promptText, state: this.currentState })
+        body: JSON.stringify({ query: promptText.trim(), state: this.currentState })
       });
       const data = await res.json();
-      this.chatMessages.push({ sender: "ai", text: data.answer });
-      this.updateChatUI();
+      this.chatMessages.pop(); // remove loading indicator
+      this.chatMessages.push({ sender: "ai", text: data.answer || "No response received." });
     } catch (e) {
-      this.chatMessages.push({ sender: "ai", text: "Error connecting to ADK Agent." });
+      this.chatMessages.pop();
+      this.chatMessages.push({ sender: "ai", text: "Error connecting to backend ADK Agent." });
+    } finally {
       this.updateChatUI();
     }
   }
