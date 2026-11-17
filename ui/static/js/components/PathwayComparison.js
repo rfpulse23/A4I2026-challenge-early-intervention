@@ -28,7 +28,7 @@ export class PathwayComparison {
               <span class="pathway-type-title title-recommended">1. Recommended Path (AI)</span>
               <span class="pill-badge pill-within-limit">Within 45-day limit</span>
               <span class="app-divider" style="height: 14px;"></span>
-              <span class="pathway-days-summary">Estimated total: <strong class="days-stat-number days-green">${recTotal}</strong> days</span>
+              <span class="pathway-days-summary">Estimated total: <strong class="days-stat-number days-green">${recTotal} days</strong></span>
             </div>
           </div>
           
@@ -83,7 +83,7 @@ export class PathwayComparison {
               <span class="pathway-type-title title-usual">2. Usual Path (Historical)</span>
               <span class="pill-badge pill-over-limit">Over 45-day limit</span>
               <span class="app-divider" style="height: 14px;"></span>
-              <span class="pathway-days-summary">Estimated total: <strong class="days-stat-number days-red">${histTotal}</strong> days</span>
+              <span class="pathway-days-summary">Estimated total: <strong class="days-stat-number days-red">${histTotal} days</strong></span>
             </div>
           </div>
 
