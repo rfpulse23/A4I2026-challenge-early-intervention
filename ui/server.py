@@ -34,6 +34,7 @@ from agent.tools.bonus_services import (
     triage_aging_out_risk,
     prioritize_byod_community_screening
 )
+from agent_bridge import bridge
 from agent.tools.advanced_extensions import (
     check_zero_vehicle_transit_feasibility,
     find_community_screening_sites,
@@ -235,71 +236,9 @@ class ChatQuery(BaseModel):
     state: str = "MS"
 
 @app.post("/api/chat")
-def api_chat(payload: ChatQuery):
-    q = payload.query.lower()
-    
-    # Track 1 Questions
-    if "iso gql" in q or "property graph" in q or "clarksdale" in q:
-        res = traverse_referral_property_graph("Clarksdale", requires_medicaid=True, requires_bilingual=True, state_code=payload.state)
-        opt = res.get("optimal_compliant_pathway", {})
-        return {
-            "answer": f"ISO GQL Variable-Length Traversal Complete:\n\nOrigin: {res['origin_clinic']['name']} ({res['origin_clinic']['county']})\nOptimal Pathway: {opt.get('total_cumulative_wait_days', 22)} cumulative days (Clears 45-day federal clock with {opt.get('days_under_statutory_limit', 23)} days buffer!).\n\nTarget Evaluation Hub: {opt.get('evaluation_hub', {}).get('name')} (Medicaid Accepted, Spanish Bilingual).\n\nExecuted ISO GQL Syntax:\nGRAPH `a4i_early_intervention.ReferralGraph`\nMATCH (clinic:CareNode)-[hops:ReferralHandoff]->{{2,4}}(vendor:CareNode)\nFILTER total_wait <= 45\nRETURN clinic, hops, vendor;"
-        }
-    elif "transit" in q or "bus" in q or "zero-vehicle" in q:
-        trans = check_zero_vehicle_transit_feasibility("28011950701", "SYN-PROV-MS-019")
-        return {
-            "answer": f"Transit Feasibility Guardrail Check (Bolivar County, tract 28011950701 -> Greenwood Eval Hub):\n\n• Travel Distance: {trans['travel_distance_km']} km\n• Zero-Vehicle Burden: {trans['zero_vehicle_household_rate_pct']}% of households\n• Public Bus Feasible: FALSE (No direct bus transit over 159 km)\n\nACTION TRIGGERED: Automatically dispatch Medicaid Non-Emergency Transportation (NEMT) ride to guarantee 45-day evaluation attendance."
-        }
-    elif "reserve" in q or "acid" in q or "slot lock" in q:
-        lock = reserve_evaluation_slot("CHAIN-MS-009", "SYN-PROV-MS-019", 20, "COORD-CLARKSDALE-01")
-        return {
-            "answer": f"ACID Slot Reservation Confirmed!\n\n• Lock Token: {lock['reservation_token']}\n• Status: {lock['lock_status']}\n• Provider: {lock['provider_id']}\n• Case Chain ID: {lock['case_chain_id']}\n• Concurrency Guarantee: Slot locked atomically; prevents concurrent coordinators from double-booking scarce bilingual evaluators."
-        }
-    elif "defend" in q or "ui" in q:
-        return {
-            "answer": "Defense of UI Choice (Craft & Communication):\nWe deliberately chose the Google ADK Web interface because intake coordinators require a zero-friction conversational assistant that pairs real-time multi-hop graph decision support with instantly exportable, compassionate, bilingual caregiver action plans and transactional ACID slot locks to eliminate administrative burden."
-        }
-    elif "caregiver action note" in q or "action note" in q:
-        return {
-            "answer": "Caregiver Action Note generated:\n\n[English]: Dear Family, your child's developmental evaluation is confirmed with Greenwood Evaluation Hub #019 within 14 business days. Medicaid Non-Emergency Transportation (NEMT) is scheduled at no cost.\n\n[Español]: Estimada familia, la evaluación de desarrollo de su niño(a) está confirmada con el Centro de Evaluación Greenwood #019 dentro de 14 días laborables. Transporte gratuito de Medicaid (NEMT) ha sido programado."
-        }
-    elif "breached 45" in q or "trace" in q or "chain" in q:
-        diag = trace_referral_chain(payload.state)
-        return {
-            "answer": f"Multi-Hop Graph Trace Complete for {payload.state}:\nTraversed {diag['total_chains_analyzed']} multi-hop referral chains. {diag['breached_chains_count']} chains ({round(100 - diag['compliance_rate_pct'], 1)}%) breached the 45-day limit. Root cause: paper-fax handoffs through regional coordinator hubs triggering 3-hop bounce loops taking up to 76 days."
-        }
-    # Track 2 Questions
-    elif "intake hub 012" in q or "intake hub 009" in q or "healthy" in q:
-        return {
-            "answer": "Intake Hub SYN-PROV-MS-009 has a short internal wait (median 5–6 days), so it looks healthy on a flat spreadsheet. But paper faxes blindly forwarded into saturated evaluation centers cause 3-hop bounce loops that take 76 days, breaching federal compliance by 31 days!"
-        }
-    elif "switch from paper fax" in q or "counterfactual" in q or "what if" in q:
-        q4 = simulate_counterfactual_bottlenecks(payload.state)
-        return {
-            "answer": f"Query 4 Counterfactual Bottleneck Simulation:\nReplacing paper-fax intake statewide with an electronic portal (4-day baseline wait) recovers {q4['cases_recovered_to_compliance']} of {q4['baseline_breaches']} ({q4['recovery_rate_pct']}%) breached episodes to compliance, saving {q4['total_child_days_saved']} cumulative child-days in Mississippi!"
-        }
-    elif "which intake hub saves" in q or "bounce hub" in q:
-        bottlenecks = diagnose_systemic_bottlenecks(payload.state)
-        top = bottlenecks["top_regional_bounce_hubs"][0]
-        return {
-            "answer": f"Regional Bounce Hub Diagnosis:\nHub {top['provider_id']} ({top['organization_name']}) is the #1 bounce hub. Upgrading this single node to electronic routing saves {top['downstream_wait_days_caused']} downstream delay days."
-        }
-    # Track 3 Questions
-    elif "screening" in q or "community screening" in q or "season" in q:
-        plan = plan_community_screening_season(state_code=payload.state, top_n_tracts=3)
-        top_tract = plan["priority_screening_tracts"][0]
-        return {
-            "answer": f"Track 3 Community Screening Season Recommendation:\nTop Priority Tract: {top_tract['county_name']} (Tract {top_tract['census_tract_geoid']})\n• Under-5 Poverty: {top_tract['under_5_poverty_rate_pct']}%\n• Zero-Vehicle Households: {top_tract['zero_vehicle_household_pct']}%\n• Downstream Hub: {top_tract['closest_downstream_eval_hub']} ({top_tract['distance_to_eval_hub_km']} km, wait: {top_tract['downstream_hub_wait_days']}d)\n• Downstream Capacity Verified: {top_tract['downstream_45day_capacity_verified']}\n• Action: {top_tract['screening_season_action']}"
-        }
-    elif "aging out" in q or "32 month" in q or "cliff" in q:
-        age_out = triage_aging_out_risk(32)
-        return {
-            "answer": f"Query 5 Aging-Out Triage (32 Months Old):\n• Risk Tier: {age_out['aging_out_risk_tier']}\n• Months Remaining: {age_out['months_until_part_c_termination']} months\n• Urgency: {age_out['evaluation_urgency']}\n• Statutory Requirement: Immediate expedited evaluation and concurrent Part B preschool transition conference under 34 CFR § 303.209 before 3rd birthday."
-        }
-    else:
-        return {
-            "answer": f"I analyzed your request regarding '{payload.query}' under federal IDEA Part C law (34 CFR § 303.310). Our agent enforces a strict 45-day statutory window, validates Medicaid and bilingual credentials, and triggers automated NEMT transit assistance for zero-vehicle households."
-        }
+async def api_chat(payload: ChatQuery):
+    answer = await bridge.ask(query=payload.query, state_code=payload.state)
+    return {"answer": answer}
 
 @app.get("/", response_class=HTMLResponse)
 def index():
