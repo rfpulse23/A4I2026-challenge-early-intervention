@@ -15,6 +15,7 @@ class App {
     this.auditData = {};
     this.screeningData = {};
     this.isLoadingChat = false;
+    this.quickChipsCollapsed = false;
     this.chatMessages = [
       {
         sender: "user",
@@ -171,6 +172,21 @@ class App {
     }
   }
 
+  toggleQuickChips() {
+    const container = document.getElementById("quick-chips-container");
+    const icon = document.getElementById("quick-chips-toggle-icon");
+    if (!container || !icon) return;
+
+    this.quickChipsCollapsed = !this.quickChipsCollapsed;
+    if (this.quickChipsCollapsed) {
+      container.style.display = "none";
+      icon.textContent = "expand_more";
+    } else {
+      container.style.display = "flex";
+      icon.textContent = "expand_less";
+    }
+  }
+
   async handleTrackSwitch() {
     await this.fetchData();
     this.render();
@@ -254,6 +270,15 @@ class App {
       root.innerHTML = assist.render();
       this.bindChatEvents();
       
+      // Preserve quick chips collapsed state if toggled
+      if (this.quickChipsCollapsed) {
+        const container = document.getElementById("quick-chips-container");
+        const icon = document.getElementById("quick-chips-toggle-icon");
+        if (container) container.style.display = "none";
+        if (icon) icon.textContent = "expand_more";
+      }
+
+      // Automatically scroll to the latest message so response is immediately visible
       const history = document.getElementById("assist-chat-history");
       if (history) {
         history.scrollTop = history.scrollHeight;

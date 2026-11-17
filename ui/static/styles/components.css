@@ -774,3 +774,70 @@
   margin-bottom: 16px;
   line-height: 1.5;
 }
+
+/* Refined Compact Quick Chips Bar (Prevents Blocking Agent Answers) */
+.assist-quick-chips-wrapper {
+  padding: 8px 14px;
+  background-color: #f8fafd;
+  border-top: 1px solid var(--md-outline-variant);
+  flex-shrink: 0;
+}
+
+.quick-chips-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 6px;
+  user-select: none;
+}
+
+.quick-chips-header .quick-title {
+  margin-bottom: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--md-on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quick-chips-toggle-icon {
+  font-size: 16px;
+  color: var(--md-on-surface-variant);
+  transition: transform 0.2s ease;
+}
+
+.quick-chips-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.quick-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--md-surface);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-pill);
+  font-size: 11px;
+  color: var(--md-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.quick-chip-btn:hover {
+  background-color: #e8f0fe;
+  border-color: #a8c7fa;
+  transform: translateY(-1px);
+}
+
+.quick-chip-btn .material-symbols-outlined {
+  font-size: 14px;
+}
