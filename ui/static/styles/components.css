@@ -227,12 +227,16 @@
   align-items: center;
   gap: 18px;
   font-size: 13px;
-  color: var(--md-on-surface);
+  color: #444746;
+}
+
+.meta-item {
+  color: #444746;
 }
 
 .meta-item strong {
-  font-weight: 500;
-  color: var(--md-on-surface-variant);
+  font-weight: 700 !important;
+  color: #000000 !important;
 }
 
 /* AI Insights Banner */
