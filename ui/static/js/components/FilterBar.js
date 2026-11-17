@@ -1,9 +1,8 @@
 export class FilterBar {
-  constructor(candidates = [], selectedCandidate = "Mateo S.", selectedState = "MS", selectedTrack = "new_case") {
+  constructor(candidates = [], selectedCandidate = "Mateo S.", selectedState = "MS") {
     this.candidates = candidates;
     this.selectedCandidate = selectedCandidate;
     this.selectedState = selectedState;
-    this.selectedTrack = selectedTrack;
   }
 
   render() {
@@ -13,9 +12,9 @@ export class FilterBar {
           <label class="filter-label">Challenge Track & Role</label>
           <div class="filter-input-wrap">
             <select class="filter-select" id="select-task-mode">
-              <option value="new_case" ${this.selectedTrack === 'new_case' ? 'selected' : ''}>🧭 Track 1: Today's Toddler Referral</option>
-              <option value="network_audit" ${this.selectedTrack === 'network_audit' ? 'selected' : ''}>🕸️ Track 2: This Quarter's Network Audit</option>
-              <option value="screening_season" ${this.selectedTrack === 'screening_season' ? 'selected' : ''}>📋 Track 3: This Community Screening Season</option>
+              <option value="new_case">Track 1: Today's Toddler Referral</option>
+              <option value="network_audit">Track 2: Quarterly Network Audit</option>
+              <option value="screening_season">Track 3: Community Screening Season</option>
             </select>
             <span class="material-symbols-outlined input-icon-right" style="pointer-events:none;">expand_more</span>
           </div>
@@ -36,12 +35,16 @@ export class FilterBar {
           </div>
         </div>
 
-        <div class="filter-group" style="${this.selectedTrack !== 'new_case' ? 'opacity: 0.5; pointer-events: none;' : ''}">
-          <label class="filter-label">Candidate Name</label>
+        <div class="filter-group">
+          <label class="filter-label">Active Candidate Referral</label>
           <div class="filter-input-wrap">
-            <span class="material-symbols-outlined input-icon-left">search</span>
-            <input type="text" class="filter-input" id="input-candidate" value="${this.selectedCandidate}" placeholder="Search candidate..." />
-            <span class="material-symbols-outlined input-icon-right" id="clear-candidate-btn">close</span>
+            <select class="filter-select" id="select-candidate-dropdown" style="min-width: 250px;">
+              <option value="Mateo S." ${this.selectedCandidate === 'Mateo S.' ? 'selected' : ''}>Mateo S. (20m, Spanish, Medicaid - MS)</option>
+              <option value="Sophia R." ${this.selectedCandidate === 'Sophia R.' ? 'selected' : ''}>Sophia R. (31m, English, Medicaid Age-Out - MS)</option>
+              <option value="Elena V." ${this.selectedCandidate === 'Elena V.' ? 'selected' : ''}>Elena V. (22m, Spanish Autism Screening - TX)</option>
+              <option value="Liam T." ${this.selectedCandidate === 'Liam T.' ? 'selected' : ''}>Liam T. (16m, Motor Delay - CA)</option>
+            </select>
+            <span class="material-symbols-outlined input-icon-right" style="pointer-events:none;">expand_more</span>
           </div>
         </div>
 
