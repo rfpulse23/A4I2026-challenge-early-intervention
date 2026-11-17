@@ -703,3 +703,62 @@
 .send-btn:hover {
   background-color: var(--md-surface-variant);
 }
+
+/* ==========================================================================
+   Co-Pilot In-Canvas Action Chips & Caregiver Plan Modal
+   ========================================================================== */
+
+.ai-action-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(194, 231, 255, 0.4);
+}
+
+.copilot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  border: 1px solid var(--md-outline-variant);
+  color: #0b57d0;
+  font-family: var(--md-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.copilot-chip:hover {
+  background-color: #f0f7ff;
+  border-color: #0b57d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(11, 87, 208, 0.12);
+}
+
+.copilot-chip .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.copilot-chip.chip-active {
+  background-color: #e6f4ea !important;
+  border-color: #137333 !important;
+  color: #137333 !important;
+  font-weight: 600;
+}
+
+.copilot-chip.chip-warn {
+  color: #b06000;
+}
+
+.copilot-chip.chip-warn:hover {
+  background-color: #fef7e0;
+  border-color: #b06000;
+}
+

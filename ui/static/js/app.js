@@ -198,7 +198,8 @@ class App {
       });
       const data = await res.json();
       this.chatMessages.pop(); // remove loading indicator
-      this.chatMessages.push({ sender: "ai", text: data.answer || "No response received." });
+      const answer = data.answer || "No response received.";
+      this.chatMessages.push({ sender: "ai", text: answer });
 
       // Dynamically update the LEFT SIDE of the dashboard based on the agent answer
       if (data.ui_update) {
@@ -210,6 +211,31 @@ class App {
     } finally {
       this.updateChatUI();
     }
+  }
+
+  triggerLockSlot() {
+    this.slotLocked = "RES-8569C455";
+    const chip = document.getElementById("chip-lock-slot");
+    const label = document.getElementById("label-lock-slot");
+    if (chip && label) {
+      chip.classList.add("chip-active");
+      const icon = chip.querySelector(".material-symbols-outlined");
+      if (icon) icon.textContent = "check_circle";
+      label.textContent = "Locked: RES-8569C455";
+    }
+    this.askPrompt("Lock an evaluation slot with an ACID reservation token at Greenwood Eval Hub (SYN-PROV-MS-019).");
+  }
+
+  triggerTransitCheck() {
+    const chip = document.getElementById("chip-check-transit");
+    if (chip) chip.classList.add("chip-active");
+    this.askPrompt("Can a zero-vehicle caregiver reach the evaluation hub by public bus from Bolivar County?");
+  }
+
+  triggerCaregiverPlan() {
+    const chip = document.getElementById("chip-caregiver-plan");
+    if (chip) chip.classList.add("chip-active");
+    this.askPrompt("Generate a bilingual caregiver action note in English and Spanish for Mateo S.");
   }
 
   async handleSendChat() {

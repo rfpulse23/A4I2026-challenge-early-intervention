@@ -52,6 +52,24 @@ export class AiInsightsBanner {
         <div class="ai-insights-text" id="ai-insights-content">
           ${this.insightsText}
         </div>
+        <div class="ai-action-chips">
+          <button class="copilot-chip" id="chip-caregiver-plan" onclick="window.app.triggerCaregiverPlan()">
+            <span class="material-symbols-outlined">description</span>
+            <span>Caregiver Action Plan</span>
+          </button>
+          <button class="copilot-chip" id="chip-lock-slot" onclick="window.app.triggerLockSlot()">
+            <span class="material-symbols-outlined">lock</span>
+            <span id="label-lock-slot">Lock Slot (Hub 019)</span>
+          </button>
+          <button class="copilot-chip" id="chip-check-transit" onclick="window.app.triggerTransitCheck()">
+            <span class="material-symbols-outlined">directions_bus</span>
+            <span>Check NEMT Transit</span>
+          </button>
+          <button class="copilot-chip chip-warn" onclick="window.app.askPrompt('Diagnose why Intake Hub 009 triggers paper-fax 3-hop bounce loops taking 76 days.')">
+            <span class="material-symbols-outlined">warning</span>
+            <span>Diagnose 76d Bounce Loop</span>
+          </button>
+        </div>
       </section>
     `;
   }
