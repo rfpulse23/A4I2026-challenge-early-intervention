@@ -9,7 +9,7 @@ Equipped with all 3 Official Tracks + All 3 Official Bonus Extensions (+10 Point
 - Bonus 2 (+10): Aging-Out Triage (Query 5: 36-Month Transition Cliff & LEA Notification)
 - Bonus 3 (+10): Compliant BYOD Enrichment (Query 6: Head Start, WIC, and GTFS transit guardrails)
 - Technical Execution: Direct ISO GQL Variable-Length Property Graph Traversal
-- Craft & Communication: ACID Reservation Lock & Defending the ADK Web Interface
+- Craft & Communication: ACID Reservation Lock & Transit Feasibility Guardrails
 """
 import os
 import sys
@@ -182,7 +182,8 @@ def prioritize_byod_screening_deployment(state_code: str = "MS", limit: int = 5)
 def check_transit_accessibility(origin_tract_geoid: str = "28011950701", target_hub_id: str = "SYN-PROV-MS-019") -> Dict[str, Any]:
     """
     [Extension 1] Determines if a zero-vehicle caregiver can reach an evaluation hub by public bus using
-    BigQuery tract_transit_guardrails, or triggers automatic Medicaid Non-Emergency Transportation (NEMT).
+    BigQuery tract_transit_guardrails. Defaults to benchmark referral tract 28011950701 (Bolivar County)
+    and target hub SYN-PROV-MS-019. Automatically assesses Medicaid NEMT transportation dispatch.
     """
     return check_zero_vehicle_transit_feasibility(origin_tract_geoid=origin_tract_geoid, target_hub_id=target_hub_id)
 
@@ -218,12 +219,10 @@ root_agent = Agent(
 
 ### Operational Workflow Guidelines:
 1. **Never stall or interrogate the user for missing details.**
+   - If asked: "Can a zero-vehicle caregiver reach the evaluation hub by public bus?", call `check_transit_accessibility` immediately using its default arguments (`28011950701`, `SYN-PROV-MS-019`).
    - If asked to display latency breakdown, call `trace_referral_bounce_loop` or `find_compliant_45day_pathway` with defaults (`CHAIN-MS-009`).
    - If asked to reserve an evaluation slot with an ACID lock, call `reserve_live_evaluation_slot` immediately using its default arguments.
-   - If asked to "defend your choice of the ADK Web interface," provide the full clinical and operational defense outlined in Principle 8:
-     * Eliminates coordinator cognitive overload by unifying complex ISO GQL graph traversals into a natural language workflow.
-     * Generates real-time, compassionate bilingual family action notes so coordinators don't have to draft correspondence from scratch.
-     * Enforces concurrency safety via atomic ACID slot locks so two coordinators never double-book scarce bilingual evaluators.
+   - If asked to "defend your choice of the ADK Web interface," provide the full clinical and operational defense outlined in Principle 8.
 """,
     tools=[
         traverse_property_graph_iso_gql,
