@@ -8,6 +8,8 @@ In rural districts such as the Mississippi Delta, statutory compliance dropped t
 
 This document contrasts the historical paper-fax baseline against the prospective, compliant electronic route orchestrated by the **First Milestones Agent**.
 
+![Early Intervention Pathway Comparison: 76-Day Paper-Fax Breach vs. 22-Day Compliant Route](pathway_comparison.png)
+
 ---
 
 ## 2. BigQuery ISO GQL Graph Traversal Query
