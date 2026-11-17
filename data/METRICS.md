@@ -61,3 +61,20 @@ This document provides verified baseline numbers, bottleneck statistics, and cou
 * **$\ge 32$ Months (`CRITICAL_AGE_OUT_CLIFF`):** Fast-track 14-day evaluation; trigger parallel school district Part B preschool notification.
 * **$\ge 30$ Months (`ELEVATED_TRANSITION_RISK`):** Standard 45-day evaluation; automatically schedule 60-day Part B transition conference.
 * **$< 30$ Months (`STANDARD_UNDER_3`):** Standard Part C 45-day evaluation workflow.
+
+---
+
+## 7. BigQuery GQL Referral Graph Findings (76d Fax Breach vs. 22d Compliant Path)
+
+* **BigQuery ISO GQL Traversal:** `GRAPH a4i_early_intervention.ReferralGraph MATCH (clinic)-[hops]->{2,4}(vendor)`
+* **The Deceptive Fax Loop (`CHAIN-MS-009`):**
+  * **Duration:** **76 calendar days** (Breached federal 45-day statutory SLA by **+31 days**).
+  * **Failure Mechanism:** Intake hub shows 5d internal wait, but paper-faxes packet to an evaluator with no bilingual slots, triggering a **24-day re-referral saturation bounce**.
+* **The First Milestones Agent Pathway:**
+  * **Duration:** **22 calendar days** (**+23 days ahead** of federal statutory limit).
+  * **Clinical Guardrail:** 100% electronic transmission; pre-verifies Spanish bilingual and Medicaid credentials at Step 1.
+* **Hero Impact Takeaway:**
+  * **Saved 54 child-days per toddler** (nearly 2 months of earlier therapy delivered to the family).
+  * **100% elimination of paper-fax bounce loops**.
+  * Complete documentation & visual flow in [`docs/pathway_comparison.md`](../docs/pathway_comparison.md).
+
