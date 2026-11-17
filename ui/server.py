@@ -374,12 +374,15 @@ class ChatQuery(BaseModel):
 async def api_chat(payload: ChatQuery):
     """
     Connects the UI chat window directly to the live autonomous Google ADK Agent
-    equipped with all 13 tools across all 3 tracks + bonus extensions.
+    and returns both the agent answer and dynamic UI update for the left side of the dashboard.
     """
     result = await bridge.ask(query=payload.query, state_code=payload.state)
-    if isinstance(result, dict) and "answer" in result:
-        return result
-    return {"answer": str(result)}
+    if isinstance(result, dict):
+        return {
+            "answer": result.get("answer", ""),
+            "ui_update": result.get("ui_update", None)
+        }
+    return {"answer": str(result), "ui_update": None}
 
 @app.get("/", response_class=HTMLResponse)
 def index():
