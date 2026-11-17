@@ -37,7 +37,7 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# Mock dynamic database of candidates across states (derived from census tracts and referral chains)
+# Realistic dynamic cases across states matching clinical triage scenarios
 CANDIDATES_REGISTRY = [
     {
         "id": "CAND-001",
@@ -49,7 +49,39 @@ CANDIDATES_REGISTRY = [
         "state_code": "MS",
         "state_name": "Mississippi (MS)",
         "tract_geoid": "28011950701",
-        "historical_chain_id": "CHAIN-MS-009"
+        "historical_chain_id": "CHAIN-MS-009",
+        "recommended_path": {
+            "estimated_total_days": 37,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–7"},
+                {"title": "Intake", "days_label": "Day 8–12"},
+                {"title": "Eval Hub 019", "days_label": "Day 13–26"},
+                {"title": "Therapy", "days_label": "Day 27–37"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Clinic Referral (Clinic 003)", "channel": "E-Referral", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial referral and documentation."},
+                {"step_no": 2, "step_name": "Intake (Coordinator 011)", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "12 days", "notes": "Accepts Medicaid; Spanish services available."},
+                {"step_no": 3, "step_name": "Evaluation (Eval Hub 019)", "channel": "E-Referral", "wait_days": "14 days", "cumulative": "26 days", "notes": "Bilingual evaluator; Part C vendor enrolled."},
+                {"step_no": 4, "step_name": "Therapy Start (Therapy Services)", "channel": "E-Referral", "wait_days": "11 days", "cumulative": "37 days", "notes": "Can initiate services within compliance window."}
+            ]
+        },
+        "usual_path": {
+            "estimated_total_days": 73,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–7"},
+                {"title": "Intake Hub 012", "days_label": "Day 8–14"},
+                {"title": "Eval Hub", "days_label": "Day 15–28"},
+                {"title": "Returned", "days_label": "+11 days", "is_returned": True},
+                {"title": "Therapy", "days_label": "Day 40–73"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Screening Clinic (Clinic 003)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial batch faxing with incomplete Medicaid pre-check."},
+                {"step_no": 2, "step_name": "Intake Hub (Coordinator 012)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "14 days", "notes": "Low internal wait (5d), but forwarded via paper fax without language verification."},
+                {"step_no": 3, "step_name": "Downstream Hub (Eval Hub 008)", "channel": "Paper Fax", "wait_days": "14 days", "cumulative": "28 days", "notes": "Packet queued on waitlist; no Spanish bilingual clinician."},
+                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "11 days", "cumulative": "39 days", "notes": "Bounced back to coordinator: missing bilingual evaluator."},
+                {"step_no": 5, "step_name": "Second Evaluation & Therapy", "channel": "Paper Fax", "wait_days": "34 days", "cumulative": "73 days", "notes": "Severely breached Part C 45-day federal clock by 28 days."}
+            ]
+        }
     },
     {
         "id": "CAND-002",
@@ -57,35 +89,131 @@ CANDIDATES_REGISTRY = [
         "age_months": 31,
         "medicaid": True,
         "language": "English",
-        "primary_concern": "Speech / Language (Age-Out Risk)",
+        "primary_concern": "Speech / Language (Part C 36m Age-Out Risk)",
         "state_code": "MS",
         "state_name": "Mississippi (MS)",
         "tract_geoid": "28049001300",
-        "historical_chain_id": "CHAIN-MS-014"
+        "historical_chain_id": "CHAIN-MS-014",
+        "recommended_path": {
+            "estimated_total_days": 21,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–4"},
+                {"title": "Fast Intake", "days_label": "Day 5–9"},
+                {"title": "Expedited Hub", "days_label": "Day 10–17"},
+                {"title": "Therapy", "days_label": "Day 18–21"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Pediatric Clinic (Hinds Co)", "channel": "E-Referral", "wait_days": "4 days", "cumulative": "4 days", "notes": "Fast-tracked: flagged child at 31 months approaching 36m cliff."},
+                {"step_no": 2, "step_name": "Part C Intake Desk", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "9 days", "notes": "Electronic direct handoff with concurrent Part B preschool alert."},
+                {"step_no": 3, "step_name": "Multidisciplinary Eval Hub", "channel": "E-Referral", "wait_days": "8 days", "cumulative": "17 days", "notes": "Priority slot assigned; Medicaid billing verified."},
+                {"step_no": 4, "step_name": "Community Speech Therapy", "channel": "E-Referral", "wait_days": "4 days", "cumulative": "21 days", "notes": "IFSP established 24 days ahead of federal 45-day deadline."}
+            ]
+        },
+        "usual_path": {
+            "estimated_total_days": 68,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–8"},
+                {"title": "Intake Hub 012", "days_label": "Day 9–18"},
+                {"title": "Eval Hub", "days_label": "Day 19–35"},
+                {"title": "Returned", "days_label": "+12 days", "is_returned": True},
+                {"title": "Therapy", "days_label": "Day 48–68"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Screening Clinic", "channel": "Paper Fax", "wait_days": "8 days", "cumulative": "8 days", "notes": "Paper intake batch faxed on Friday."},
+                {"step_no": 2, "step_name": "Intake Hub 012", "channel": "Paper Fax", "wait_days": "10 days", "cumulative": "18 days", "notes": "Fax transmission lag."},
+                {"step_no": 3, "step_name": "County Eval Clinic", "channel": "Paper Fax", "wait_days": "17 days", "cumulative": "35 days", "notes": "Evaluation backlog."},
+                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "12 days", "cumulative": "47 days", "notes": "Bounced: age verification showed 32+ months without Part B outreach."},
+                {"step_no": 5, "step_name": "Delayed IFSP", "channel": "Paper Fax", "wait_days": "21 days", "cumulative": "68 days", "notes": "Child aged out of Part C prior to receiving early intervention."}
+            ]
+        }
     },
     {
         "id": "CAND-003",
-        "name": "Liam T.",
-        "age_months": 18,
-        "medicaid": False,
-        "language": "English",
-        "primary_concern": "Gross Motor & Adaptive",
-        "state_code": "CA",
-        "state_name": "California (CA)",
-        "tract_geoid": "06037206010",
-        "historical_chain_id": "CHAIN-CA-001"
-    },
-    {
-        "id": "CAND-004",
         "name": "Elena V.",
-        "age_months": 24,
+        "age_months": 22,
         "medicaid": True,
         "language": "Spanish",
-        "primary_concern": "Social-Emotional / Autism Screening",
+        "primary_concern": "Social-Communication / Autism Screening",
         "state_code": "TX",
         "state_name": "Texas (TX)",
         "tract_geoid": "48113010000",
-        "historical_chain_id": "CHAIN-TX-005"
+        "historical_chain_id": "CHAIN-TX-005",
+        "recommended_path": {
+            "estimated_total_days": 32,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–6"},
+                {"title": "Intake Hub", "days_label": "Day 7–11"},
+                {"title": "Autism Hub", "days_label": "Day 12–24"},
+                {"title": "ABA/Speech", "days_label": "Day 25–32"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Dallas Pediatric Clinic", "channel": "E-Referral", "wait_days": "6 days", "cumulative": "6 days", "notes": "M-CHAT-R screening positive."},
+                {"step_no": 2, "step_name": "Regional Part C Intake", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "11 days", "notes": "Pre-matched Spanish bilingual evaluation team."},
+                {"step_no": 3, "step_name": "Comprehensive Eval Center", "channel": "E-Referral", "wait_days": "13 days", "cumulative": "24 days", "notes": "Developmental pediatrician + SLP bilingual assessment."},
+                {"step_no": 4, "step_name": "Early Intervention Services", "channel": "E-Referral", "wait_days": "8 days", "cumulative": "32 days", "notes": "Services started within 32 calendar days."}
+            ]
+        },
+        "usual_path": {
+            "estimated_total_days": 82,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–9"},
+                {"title": "Intake Desk", "days_label": "Day 10–22"},
+                {"title": "Eval Center", "days_label": "Day 23–45"},
+                {"title": "Returned", "days_label": "+15 days", "is_returned": True},
+                {"title": "Therapy", "days_label": "Day 61–82"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Clinic Fax", "channel": "Paper Fax", "wait_days": "9 days", "cumulative": "9 days", "notes": "Paper referral packet sent."},
+                {"step_no": 2, "step_name": "Intake Desk", "channel": "Paper Fax", "wait_days": "13 days", "cumulative": "22 days", "notes": "Manual intake triage queue."},
+                {"step_no": 3, "step_name": "Eval Center", "channel": "Paper Fax", "wait_days": "23 days", "cumulative": "45 days", "notes": "45-day federal clock expired while on waitlist."},
+                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "15 days", "cumulative": "60 days", "notes": "Family reached center; clinic lacked Spanish ADOS evaluator."},
+                {"step_no": 5, "step_name": "Second Center", "channel": "Paper Fax", "wait_days": "22 days", "cumulative": "82 days", "notes": "Breached federal clock by 37 days."}
+            ]
+        }
+    },
+    {
+        "id": "CAND-004",
+        "name": "Liam T.",
+        "age_months": 16,
+        "medicaid": False,
+        "language": "English",
+        "primary_concern": "Gross Motor & Muscle Tone Delay",
+        "state_code": "CA",
+        "state_name": "California (CA)",
+        "tract_geoid": "06037206010",
+        "historical_chain_id": "CHAIN-CA-001",
+        "recommended_path": {
+            "estimated_total_days": 28,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–5"},
+                {"title": "Regional Center", "days_label": "Day 6–10"},
+                {"title": "Physical Eval", "days_label": "Day 11–20"},
+                {"title": "PT Therapy", "days_label": "Day 21–28"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "LA Children's Primary Clinic", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "5 days", "notes": "Motor delay identified at 16-month check."},
+                {"step_no": 2, "step_name": "Regional Center Intake", "channel": "E-Referral", "wait_days": "5 days", "cumulative": "10 days", "notes": "Direct electronic intake coordination."},
+                {"step_no": 3, "step_name": "Pediatric PT Eval Hub", "channel": "E-Referral", "wait_days": "10 days", "cumulative": "20 days", "notes": "Licensed Part C pediatric physical therapy evaluation."},
+                {"step_no": 4, "step_name": "Early Steps Physical Therapy", "channel": "E-Referral", "wait_days": "8 days", "cumulative": "28 days", "notes": "Home-based PT services started within 28 days."}
+            ]
+        },
+        "usual_path": {
+            "estimated_total_days": 65,
+            "stepper_nodes": [
+                {"title": "Clinic", "days_label": "Day 0–7"},
+                {"title": "Intake Coordinator", "days_label": "Day 8–18"},
+                {"title": "Eval Hub", "days_label": "Day 19–34"},
+                {"title": "Returned", "days_label": "+10 days", "is_returned": True},
+                {"title": "Therapy", "days_label": "Day 45–65"}
+            ],
+            "table_rows": [
+                {"step_no": 1, "step_name": "Screening Clinic", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Paper packet sent to regional coordinator."},
+                {"step_no": 2, "step_name": "Intake Coordinator", "channel": "Paper Fax", "wait_days": "11 days", "cumulative": "18 days", "notes": "Intake queue backlog."},
+                {"step_no": 3, "step_name": "Eval Hub", "channel": "Paper Fax", "wait_days": "16 days", "cumulative": "34 days", "notes": "Waitlist delay."},
+                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "10 days", "cumulative": "44 days", "notes": "Bounced: private insurance credentialing mismatch."},
+                {"step_no": 5, "step_name": "Second Provider", "channel": "Paper Fax", "wait_days": "21 days", "cumulative": "65 days", "notes": "Exceeded Part C 45-day statutory limit."}
+            ]
+        }
     }
 ]
 
@@ -117,48 +245,58 @@ def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
     hist_diag = trace_referral_chain(state_code=state, case_chain_id=cand["historical_chain_id"])
     hist_chain = hist_diag["chains"][0] if hist_diag.get("chains") else None
     
-    # Build AI Stepper and Table
-    rec_steps = []
-    rec_table = []
-    cum_days = 0
-    
-    step_ranges = [
-        {"role": "Clinic", "short": "Clinic", "wait": 7, "notes": "Initial referral and documentation."},
-        {"role": "Intake", "short": "Intake", "wait": 5, "notes": "Accepts Medicaid; Spanish services available."},
-        {"role": "Evaluation", "short": "Eval Hub 019", "wait": 14, "notes": "Bilingual evaluator; Part C vendor enrolled."},
-        {"role": "Therapy", "short": "Therapy", "wait": 11, "notes": "Can initiate services within compliance window."}
-    ]
-    
-    for i, item in enumerate(step_ranges, 1):
-        prev_cum = cum_days
-        cum_days += item["wait"]
-        rec_steps.append({
-            "title": item["short"],
-            "days_label": f"Day {prev_cum}–{cum_days}"
-        })
-        rec_table.append({
-            "step_no": i,
-            "step_name": f"{item['role']} ({item['short']})",
-            "channel": "E-Referral",
-            "wait_days": f"{item['wait']} days",
-            "cumulative": f"{cum_days} days",
-            "notes": item["notes"]
-        })
-        
-    ai_total_days = cum_days
-    
-    # Build Historical Stepper and Table
-    hist_steps = [
-        {"title": "Clinic", "days_label": "Day 0–7"},
-        {"title": "Intake Hub 012", "days_label": "Day 8–14"},
-        {"title": "Eval Hub", "days_label": "Day 15–28"},
-        {"title": "Returned", "days_label": "+11 days", "is_returned": True},
-        {"title": "Therapy", "days_label": "Day 40–73"}
-    ]
-    
-    hist_total_days = 73
-    if hist_chain:
-        hist_total_days = hist_chain["cumulative_wait_days"]
+    # If candidate has customized path details, use them; otherwise default
+    if "recommended_path" in cand and "usual_path" in cand:
+        rec_info = cand["recommended_path"]
+        usual_info = cand["usual_path"]
+        ai_total_days = rec_info["estimated_total_days"]
+        hist_total_days = usual_info["estimated_total_days"]
+        rec_steps = rec_info["stepper_nodes"]
+        rec_table = rec_info["table_rows"]
+        hist_steps = usual_info["stepper_nodes"]
+        hist_table = usual_info["table_rows"]
+    else:
+        # Build dynamic AI Stepper and Table
+        rec_steps = []
+        rec_table = []
+        cum_days = 0
+        step_ranges = [
+            {"role": "Clinic", "short": "Clinic", "wait": 7, "notes": "Initial referral and documentation."},
+            {"role": "Intake", "short": "Intake", "wait": 5, "notes": "Accepts Medicaid; Spanish services available."},
+            {"role": "Evaluation", "short": "Eval Hub 019", "wait": 14, "notes": "Bilingual evaluator; Part C vendor enrolled."},
+            {"role": "Therapy", "short": "Therapy", "wait": 11, "notes": "Can initiate services within compliance window."}
+        ]
+        for i, item in enumerate(step_ranges, 1):
+            prev_cum = cum_days
+            cum_days += item["wait"]
+            rec_steps.append({
+                "title": item["short"],
+                "days_label": f"Day {prev_cum}–{cum_days}"
+            })
+            rec_table.append({
+                "step_no": i,
+                "step_name": f"{item['role']} ({item['short']})",
+                "channel": "E-Referral",
+                "wait_days": f"{item['wait']} days",
+                "cumulative": f"{cum_days} days",
+                "notes": item["notes"]
+            })
+        ai_total_days = cum_days
+        hist_steps = [
+            {"title": "Clinic", "days_label": "Day 0–7"},
+            {"title": "Intake Hub 012", "days_label": "Day 8–14"},
+            {"title": "Eval Hub", "days_label": "Day 15–28"},
+            {"title": "Returned", "days_label": "+11 days", "is_returned": True},
+            {"title": "Therapy", "days_label": "Day 40–73"}
+        ]
+        hist_total_days = 73
+        hist_table = [
+            {"step_no": 1, "step_name": "Screening Clinic (Clinic 003)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial batch faxing with incomplete Medicaid pre-check."},
+            {"step_no": 2, "step_name": "Intake Hub (Coordinator 012)", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "14 days", "notes": "Low internal wait (5d), but forwarded via paper fax without language verification."},
+            {"step_no": 3, "step_name": "Downstream Hub (Eval Hub 008)", "channel": "Paper Fax", "wait_days": "14 days", "cumulative": "28 days", "notes": "Packet queued on waitlist; no Spanish bilingual clinician."},
+            {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "11 days", "cumulative": "39 days", "notes": "Bounced back to coordinator: missing bilingual evaluator."},
+            {"step_no": 5, "step_name": "Second Evaluation & Therapy", "channel": "Paper Fax", "wait_days": "34 days", "cumulative": f"{hist_total_days} days", "notes": "Severely breached Part C 45-day federal clock by 28 days."}
+        ]
         
     insights_text = (
         f"A faster, compliant path ({ai_total_days} days) is available by using an eligible evaluation provider "
@@ -178,13 +316,7 @@ def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
             "is_over_limit": hist_total_days > 45,
             "estimated_total_days": hist_total_days,
             "stepper_nodes": hist_steps,
-            "table_rows": [
-                {"step_no": 1, "step_name": "Screening Clinic", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "7 days", "notes": "Initial batch faxing"},
-                {"step_no": 2, "step_name": "Intake Hub 012", "channel": "Paper Fax", "wait_days": "7 days", "cumulative": "14 days", "notes": "Faxes forwarded without language verification"},
-                {"step_no": 3, "step_name": "Downstream Eval Hub", "channel": "Paper Fax", "wait_days": "14 days", "cumulative": "28 days", "notes": "Packet queued on waitlist"},
-                {"step_no": 4, "step_name": "Returned Re-Referral", "channel": "Paper Fax", "wait_days": "11 days", "cumulative": "39 days", "notes": "Bounced: missing bilingual evaluator"},
-                {"step_no": 5, "step_name": "Second Eval & Therapy", "channel": "Paper Fax", "wait_days": "34 days", "cumulative": f"{hist_total_days} days", "notes": "Severely breached Part C 45-day clock"}
-            ]
+            "table_rows": hist_table
         }
     }
 

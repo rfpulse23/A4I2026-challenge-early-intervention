@@ -42,7 +42,16 @@ class App {
     const root = document.getElementById("app-root");
     if (!root) return;
 
-    const topBar = new TopAppBar("Mississippi (MS)");
+    const stateNames = {
+      "MS": "Mississippi (MS)",
+      "AL": "Alabama (AL)",
+      "GA": "Georgia (GA)",
+      "TX": "Texas (TX)",
+      "CA": "California (CA)",
+      "NY": "New York (NY)"
+    };
+    const currentFullStateName = stateNames[this.currentState] || "Mississippi (MS)";
+    const topBar = new TopAppBar(currentFullStateName);
     const filterBar = new FilterBar([], this.currentCandidate, this.currentState);
     const candidateSummary = new CandidateSummaryBar(this.candidateData);
     const aiInsights = new AiInsightsBanner(this.pathwayData.insights);
