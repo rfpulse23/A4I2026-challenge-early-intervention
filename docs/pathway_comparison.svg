@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%" style="background:#0F172A; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#EF4444" stop-opacity="0.05" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0.05" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Title & Header -->
+  <rect x="40" y="30" width="1120" height="70" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+  <text x="65" y="60" fill="#38BDF8" font-size="12" font-weight="700" letter-spacing="1">BIGQUERY ISO GQL GRAPH TRAVERSAL vs. FIRST MILESTONES AGENT</text>
+  <text x="65" y="85" fill="#F8FAFC" font-size="20" font-weight="700">Early Intervention Pathway: 76-Day Paper-Fax Breach vs. 22-Day Compliant Route</text>
+
+  <!-- SECTION 1: BREACHED FAX PATHWAY -->
+  <rect x="40" y="120" width="1120" height="230" rx="16" fill="url(#redGrad)" stroke="#EF4444" stroke-width="1.5" filter="url(#glow)" />
+  <rect x="65" y="135" width="280" height="26" rx="13" fill="#DC2626" />
+  <text x="77" y="152" fill="#FFFFFF" font-size="11" font-weight="700">🚨 BASELINE: CHAIN-MS-009 (76 CALENDAR DAYS)</text>
+  <text x="360" y="153" fill="#FCA5A5" font-size="12" font-weight="600">Federal 45-Day SLA Breached by +31 Days · 3 Paper Faxes</text>
+
+  <!-- Node 1 -->
+  <rect x="65" y="180" width="170" height="135" rx="10" fill="#1E293B" stroke="#475569" stroke-width="1" />
+  <text x="80" y="205" fill="#94A3B8" font-size="11" font-weight="700">HOP 1: SCREENING</text>
+  <text x="80" y="228" fill="#F8FAFC" font-size="13" font-weight="700">Greenwood #01</text>
+  <text x="80" y="246" fill="#94A3B8" font-size="10.5">Pediatric Clinic</text>
+  <rect x="75" y="275" width="110" height="22" rx="6" fill="#334155" />
+  <text x="83" y="290" fill="#CBD5E1" font-size="10" font-weight="600">paper_fax · 13d</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 245 245 L 280 245" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <polygon points="280,240 290,245 280,250" fill="#64748B" />
+
+  <!-- Node 2 -->
+  <rect x="295" y="180" width="170" height="135" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1" />
+  <text x="310" y="205" fill="#FBBF24" font-size="11" font-weight="700">HOP 2: INTAKE HUB</text>
+  <text x="310" y="228" fill="#F8FAFC" font-size="13" font-weight="700">Cleveland Desk #09</text>
+  <text x="310" y="246" fill="#94A3B8" font-size="10.5">5d internal wait</text>
+  <rect x="305" y="275" width="110" height="22" rx="6" fill="#78350F" />
+  <text x="313" y="290" fill="#FDE68A" font-size="10" font-weight="600">paper_fax · 22d</text>
+
+  <!-- Arrow 2 -->
+  <polygon points="510,240 520,245 510,250" fill="#EF4444" />
+  <line x1="475" y1="245" x2="510" y2="245" stroke="#EF4444" stroke-width="2" />
+
+  <!-- Node 3: The Saturated Hub -->
+  <rect x="525" y="180" width="175" height="135" rx="10" fill="#450A0A" stroke="#EF4444" stroke-width="2" />
+  <text x="538" y="205" fill="#FCA5A5" font-size="11" font-weight="700">HOP 3: EVALUATION</text>
+  <text x="538" y="228" fill="#F8FAFC" font-size="13" font-weight="700">Greenwood Hub #13</text>
+  <text x="538" y="246" fill="#F87171" font-size="11" font-weight="700">❌ NO SPANISH SLOTS</text>
+  <rect x="535" y="275" width="145" height="22" rx="6" fill="#991B1B" />
+  <text x="541" y="290" fill="#FEE2E2" font-size="10" font-weight="700">⚠️ BOUNCED (+24d)</text>
+
+  <!-- Arrow 3: Bounce -->
+  <polygon points="740,240 750,245 740,250" fill="#EF4444" />
+  <line x1="710" y1="245" x2="740" y2="245" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" />
+
+  <!-- Node 4: Secondary Hub -->
+  <rect x="755" y="180" width="165" height="135" rx="10" fill="#1E293B" stroke="#475569" stroke-width="1" />
+  <text x="770" y="205" fill="#94A3B8" font-size="11" font-weight="700">HOP 4: SECOND EVAL</text>
+  <text x="770" y="228" fill="#F8FAFC" font-size="13" font-weight="700">Indianola Hub #17</text>
+  <text x="770" y="246" fill="#94A3B8" font-size="10.5">Re-queued queue</text>
+  <rect x="765" y="275" width="115" height="22" rx="6" fill="#334155" />
+  <text x="773" y="290" fill="#CBD5E1" font-size="10" font-weight="600">ehr_portal · 17d</text>
+
+  <!-- Arrow 4 -->
+  <polygon points="960,240 970,245 960,250" fill="#64748B" />
+  <line x1="930" y1="245" x2="960" y2="245" stroke="#64748B" stroke-width="2" />
+
+  <!-- Node 5: Therapy Vendor -->
+  <rect x="975" y="180" width="160" height="135" rx="10" fill="#1E293B" stroke="#EF4444" stroke-width="1.5" />
+  <text x="988" y="205" fill="#EF4444" font-size="11" font-weight="700">FINAL: THERAPY</text>
+  <text x="988" y="228" fill="#F8FAFC" font-size="13" font-weight="700">Indianola Vendor #29</text>
+  <text x="988" y="250" fill="#EF4444" font-size="13" font-weight="800">DAY 76</text>
+  <text x="988" y="270" fill="#F87171" font-size="10.5">31 Days Overdue</text>
+
+  <!-- SECTION 2: COMPLIANT AGENT PATHWAY -->
+  <rect x="40" y="375" width="1120" height="230" rx="16" fill="url(#greenGrad)" stroke="#10B981" stroke-width="1.5" filter="url(#glow)" />
+  <rect x="65" y="390" width="310" height="26" rx="13" fill="#059669" />
+  <text x="77" y="407" fill="#FFFFFF" font-size="11" font-weight="700">🛡️ FIRST MILESTONES AGENT ROUTE (22 DAYS)</text>
+  <text x="390" y="408" fill="#6EE7B7" font-size="12" font-weight="700">+23 Days Ahead of SLA · Saved 54 Child-Days · 100% Portal</text>
+
+  <!-- Step 1 -->
+  <rect x="65" y="435" width="225" height="135" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="1" />
+  <text x="80" y="460" fill="#34D399" font-size="11" font-weight="700">HOP 1: INTAKE</text>
+  <text x="80" y="483" fill="#F8FAFC" font-size="13" font-weight="700">Indianola Clinic #05</text>
+  <text x="80" y="501" fill="#94A3B8" font-size="10.5">Sunflower County (Local)</text>
+  <rect x="75" y="530" width="145" height="22" rx="6" fill="#064E3B" />
+  <text x="83" y="545" fill="#A7F3D0" font-size="10" font-weight="700">ehr_portal · 4 days</text>
+
+  <!-- Green Arrow 1 -->
+  <polygon points="330,500 340,505 330,510" fill="#10B981" />
+  <line x1="300" y1="505" x2="330" y2="505" stroke="#10B981" stroke-width="2.5" />
+
+  <!-- Step 2 -->
+  <rect x="345" y="435" width="225" height="135" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="1" />
+  <text x="360" y="460" fill="#34D399" font-size="11" font-weight="700">HOP 2: COORDINATION</text>
+  <text x="360" y="483" fill="#F8FAFC" font-size="13" font-weight="700">Indianola Desk #11</text>
+  <text x="360" y="501" fill="#94A3B8" font-size="10.5">Pre-validates Language/Payor</text>
+  <rect x="355" y="530" width="145" height="22" rx="6" fill="#064E3B" />
+  <text x="363" y="545" fill="#A7F3D0" font-size="10" font-weight="700">ehr_portal · 4 days</text>
+
+  <!-- Green Arrow 2 -->
+  <polygon points="610,500 620,505 610,510" fill="#10B981" />
+  <line x1="580" y1="505" x2="610" y2="505" stroke="#10B981" stroke-width="2.5" />
+
+  <!-- Step 3 -->
+  <rect x="625" y="435" width="240" height="135" rx="10" fill="#1E293B" stroke="#34D399" stroke-width="2" />
+  <text x="640" y="460" fill="#34D399" font-size="11" font-weight="700">HOP 3: EVALUATION HUB</text>
+  <text x="640" y="483" fill="#F8FAFC" font-size="13" font-weight="700">Greenwood Hub #19</text>
+  <text x="640" y="501" fill="#6EE7B7" font-size="11" font-weight="700">✅ BILINGUAL SPANISH + MEDICAID</text>
+  <rect x="635" y="530" width="145" height="22" rx="6" fill="#064E3B" />
+  <text x="643" y="545" fill="#A7F3D0" font-size="10" font-weight="700">ehr_portal · 5 days</text>
+
+  <!-- Green Arrow 3 -->
+  <polygon points="905,500 915,505 905,510" fill="#10B981" />
+  <line x1="875" y1="505" x2="905" y2="505" stroke="#10B981" stroke-width="2.5" />
+
+  <!-- Step 4 -->
+  <rect x="920" y="435" width="215" height="135" rx="10" fill="#064E3B" stroke="#34D399" stroke-width="2" />
+  <text x="935" y="460" fill="#A7F3D0" font-size="11" font-weight="700">HOP 4: ACTIVE THERAPY</text>
+  <text x="935" y="483" fill="#FFFFFF" font-size="13" font-weight="700">Greenville Vendor #28</text>
+  <text x="935" y="508" fill="#34D399" font-size="18" font-weight="800">DAY 22</text>
+  <text x="935" y="530" fill="#A7F3D0" font-size="11" font-weight="700">SAVED 54 CHILD-DAYS!</text>
+  <rect x="930" y="540" width="135" height="20" rx="4" fill="#047857" />
+  <text x="937" y="554" fill="#FFFFFF" font-size="9.5" font-weight="700">direct_message · 7d</text>
+
+  <!-- Bottom Badges -->
+  <rect x="40" y="625" width="1120" height="35" rx="8" fill="#1E293B" />
+  <text x="60" y="647" fill="#94A3B8" font-size="11.5">Impact Summary: <tspan fill="#34D399" font-weight="700">54 Calendar Days Saved</tspan> | <tspan fill="#38BDF8" font-weight="700">100% Electronic Portals</tspan> | <tspan fill="#FBBF24" font-weight="700">Zero Language Re-Referral Bounces</tspan> | Provenance: <tspan fill="#CBD5E1">All providers/chains are 100% synthetic data</tspan></text>
+</svg>
