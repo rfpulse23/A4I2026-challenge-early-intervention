@@ -66,7 +66,8 @@ flowchart LR
 * **Property:** Completely irreversible without the operational secret salt, yet **referentially consistent**—allowing the graph engine to correlate multi-hop handoff hops across coordinators without exposing the child's identity.
 
 ### Layer 2: Ephemeral Name Masking (`mask_name`)
-* Toddler and caregiver names are redacted to **First Name + Last Initial** (e.g., `Mateo S.` $ightarrow$ `Mateo R.`).
+* Toddler and caregiver names are redacted to **First Name + Last Initial** (e.g., `Mateo S.` $
+ightarrow$ `Mateo R.`).
 * In production, legal names are retained strictly in client-side ephemeral browser memory for printing the physical Caregiver Action Note and are never persisted to application databases or server logs.
 
 ### Layer 3: Temporal Offsetting & Age Preservation
@@ -123,14 +124,5 @@ In a full-scale state health agency deployment on **Google Cloud**, the software
    * BigQuery supports native column-level security. By applying **Policy Tags** to columns such as `child_home_tract_geoid` or `referral_date`, the database dynamically masks values (e.g., replacing with SHA-256 hashes or `*****`) based on the caller's Google Cloud IAM role.
 3. **Zero-Trust Graph Independence:**
    * **Crucial Architectural Benefit:** The BigQuery ISO GQL routing algorithm (`bilingual_services_listed = TRUE`, `accepts_medicaid = TRUE`, `handoff_wait_days`) **never requires personal health identifiers to calculate optimal pathways**. 
-   * De-identification can be enforced at 100% stringency without degrading routing accuracy or delaying child placement.
+   * De-identification can be enforced without degrading routing accuracy or delaying child placement.
 
----
-
-## 6. Alignment with Challenge Rubrics
-
-| Rubric Dimension | How This Privacy Architecture Elevates Score |
-| :--- | :--- |
-| **Dimension 3: Rigor & Judgment (25 Pts)** | Demonstrates deep regulatory mastery of HIPAA, FERPA, and IDEA Part C. Proves understanding of the subtle "rural small-cell" re-identification vulnerability and provides a concrete mathematical solution ($k$-anonymity and FIPS truncation). |
-| **Dimension 1: Impact & Insight (30 Pts)** | Bridges the gap between an academic hackathon prototype and an enterprise state government procurement. State health departments cannot adopt AI without these safeguards. |
-| **Dimension 2: Technical Execution (30 Pts)** | Shows elegant, modular software design (`agent.security.privacy_guard`) paired with enterprise cloud patterns (Google Cloud DLP + BigQuery Dynamic Data Masking). |
