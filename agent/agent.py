@@ -245,3 +245,15 @@ root_agent = Agent(
 # Alias for backwards compatibility
 agent = root_agent
 create_coordinator_agent = lambda model_name=None: root_agent
+
+# Export sub-agents for modular multi-agent orchestration
+try:
+    from agent.subagents import (
+        toddler_referral_subagent,
+        network_audit_subagent,
+        community_screening_subagent,
+        transit_equity_subagent,
+        multi_track_orchestrator
+    )
+except ImportError:
+    pass

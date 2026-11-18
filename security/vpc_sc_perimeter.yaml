@@ -1,0 +1,60 @@
+# ==============================================================================
+# Google Cloud VPC Service Controls (VPC-SC) Perimeter Specification
+# Project: qwiklabs-gcp-04-5956a6cfcbdf (Early Intervention 45-Day Suite)
+# Protected Services: BigQuery, Vertex AI Platform
+# ==============================================================================
+name: accessPolicies/${ACCESS_POLICY_ID}/servicePerimeters/early_intervention_data_perimeter
+title: "Early Intervention HIPAA & Part C Data Perimeter"
+description: >
+  Enforces a zero-trust network perimeter around BigQuery referral graph tables
+  and Vertex AI agent reasoning services, preventing data exfiltration and untrusted egress.
+
+perimeterType: PERIMETER_TYPE_REGULAR
+status:
+  # 1. Enclosed Project Resources
+  resources:
+    - "projects/195188148189" # Project: qwiklabs-gcp-04-5956a6cfcbdf
+
+  # 2. Restricted Google APIs inside the Perimeter
+  restrictedServices:
+    - "bigquery.googleapis.com"
+    - "aiplatform.googleapis.com"
+    - "storage.googleapis.com"
+
+  # 3. Access Levels permitted to cross the perimeter
+  accessLevels:
+    - "accessPolicies/${ACCESS_POLICY_ID}/accessLevels/authorized_ei_coordinators_level"
+
+  # 4. Ingress Policies: Authorized Coordinators & Internal Cloud Run VPC Egress
+  ingressPolicies:
+    - ingressFrom:
+        identities:
+          - "serviceAccount:195188148189-compute@developer.gserviceaccount.com"
+          - "serviceAccount:first-milestones-agent-sa@qwiklabs-gcp-04-5956a6cfcbdf.iam.gserviceaccount.com"
+        sources:
+          - accessLevel: "accessPolicies/${ACCESS_POLICY_ID}/accessLevels/authorized_ei_coordinators_level"
+      ingressTo:
+        resources:
+          - "projects/195188148189"
+        operations:
+          - serviceName: "bigquery.googleapis.com"
+            methodSelectors:
+              - method: "google.cloud.bigquery.v2.JobService.InsertJob"
+              - method: "google.cloud.bigquery.v2.TableDataService.List"
+          - serviceName: "aiplatform.googleapis.com"
+            methodSelectors:
+              - method: "*"
+
+  # 5. Egress Policies: Strict Zero-Exfiltration Guardrail
+  # Prevent copying BigQuery clinical tables to unauthorized external projects or buckets
+  egressPolicies:
+    - egressFrom:
+        identities:
+          - "serviceAccount:195188148189-compute@developer.gserviceaccount.com"
+      egressTo:
+        resources:
+          - "projects/195188148189"
+        operations:
+          - serviceName: "bigquery.googleapis.com"
+            methodSelectors:
+              - method: "google.cloud.bigquery.v2.JobService.InsertJob"

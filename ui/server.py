@@ -30,6 +30,8 @@ from agent.tools.advanced_extensions import (
     find_community_screening_sites,
     reserve_evaluation_slot
 )
+from agent.mcp_server import mcp
+from agent.main_agent import coordinator_service
 from agent.security.privacy_guard import (
     deidentify_candidate_record,
     sanitize_handoff_reason,
@@ -39,10 +41,84 @@ from agent.security.privacy_guard import (
 
 app = FastAPI(title="Early Intervention 45-Day Pathway & Triage Assistant")
 
+# Mount FastMCP SSE Server at /mcp (/mcp/sse & /mcp/messages)
+mcp_asgi_app = mcp.http_app(transport="sse")
+app.mount("/mcp", mcp_asgi_app)
+
 # Mount static directory for CSS/JS
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "first-milestones-ei-agent-and-ui",
+        "state": "MS",
+        "mcp_endpoint": "/mcp/sse",
+    }
+
+@app.get("/api/mcp/tools")
+def list_mcp_tools():
+    return {
+        "mcp_server": "FirstMilestones-ReferralGraph-MCP",
+        "protocol": "Model Context Protocol (MCP) 2024-11-05",
+        "transport": "Server-Sent Events (SSE)",
+        "endpoints": {
+            "sse_connect": "/mcp/sse",
+            "messages_post": "/mcp/messages",
+        },
+        "tools": [
+            {
+                "name": "trace_referral_bounce_loop",
+                "description": "Traverses 2..4 hop referral chains using ISO GQL with case_chain_id correlation to diagnose multi-hop bounce loops exceeding 45 days.",
+            },
+            {
+                "name": "find_compliant_45day_pathway",
+                "description": "Discovers an optimal <=45-day compliant referral pathway for an incoming toddler matching age, Medicaid, and Spanish bilingual needs.",
+            },
+            {
+                "name": "diagnose_bounce_hubs",
+                "description": "Isolates regional coordinator hubs (e.g. SYN-PROV-MS-012) where deceptively low 5-day wait times conceal 70+ day multi-hop re-referrals.",
+            },
+            {
+                "name": "simulate_counterfactual_network_fix",
+                "description": "Simulates upgrading a paper-fax intake hub to an electronic e-referral portal, calculating delayed child-days saved.",
+            },
+            {
+                "name": "run_equity_audit",
+                "description": "Audits Census tract disparities, poverty rates, zero-vehicle transit friction, and data traps.",
+            },
+            {
+                "name": "generate_45_day_brief",
+                "description": "Compiles the full 5-part 45-Day Pathway & Bottleneck Brief for Mississippi IDEA Part C.",
+            },
+        ],
+        "resources": [
+            "referral://standards/idea-part-c",
+            "bigquery://dataset/a4i_early_intervention",
+        ],
+    }
+
+class BriefRequest(BaseModel):
+    child_age_months: int = 22
+    home_tract_geoid: str = "28133950100"
+    primary_language: str = "Spanish"
+    medicaid_enrolled: bool = True
+    family_name: str = "Ramirez"
+    child_name: str = "Mateo"
+
+@app.post("/api/brief")
+def generate_brief(req: BriefRequest):
+    return coordinator_service.generate_45_day_brief(
+        child_age_months=req.child_age_months,
+        home_tract_geoid=req.home_tract_geoid,
+        primary_language=req.primary_language,
+        medicaid_enrolled=req.medicaid_enrolled,
+        family_name=req.family_name,
+        child_name=req.child_name,
+    )
 
 # Realistic dynamic cases across states matching clinical triage scenarios
 CANDIDATES_REGISTRY = [
@@ -367,19 +443,32 @@ def api_compare_pathways(candidate_name: str = "Mateo S.", state: str = "MS"):
     }
 
 class ChatQuery(BaseModel):
-    query: str
+    query: Optional[str] = None
+    question: Optional[str] = None
     state: str = "MS"
 
 @app.post("/api/chat")
+@app.post("/api/assistant/ask")
 async def api_chat(payload: ChatQuery):
     """
     Connects the UI chat window directly to the live autonomous Google ADK Agent
-    equipped with all 13 tools across all 3 tracks + bonus extensions.
+    and returns both the agent answer and dynamic UI update for the left side of the dashboard.
     """
-    result = await bridge.ask(query=payload.query, state_code=payload.state)
-    if isinstance(result, dict) and "answer" in result:
-        return result
-    return {"answer": str(result)}
+    raw_query = payload.query or payload.question or ""
+    result = await bridge.ask(query=raw_query, state_code=payload.state)
+    if isinstance(result, dict):
+        ans = result.get("answer", "")
+        ui_up = result.get("ui_update", None)
+    else:
+        ans = str(result)
+        ui_up = None
+
+    return {
+        "answer": ans,
+        "response": ans,
+        "ui_update": ui_up,
+        "status": "success"
+    }
 
 @app.get("/", response_class=HTMLResponse)
 def index():
